@@ -1302,6 +1302,50 @@
             appendHexTerminal(`RX << [00 01 00 00 00 0D 01 03 0A ${hexPv} ${hexMv} ${hexSp} 0001 0000] (2.4ms)`, 'rx');
         }, 850);
 
+        // --- APEX SCADA WebSocket Hybrid Bridge Integration ---
+        const WS_SERVER_URL = "ws://127.0.0.1:8000/ws/telemetry"; // سيرفر البايثون المحلي للربط الفعلي
+        let wsConnection = null;
+        let isRealtimeHardwareActive = false;
+
+        function initHardwareWebSocket() {
+            wsConnection = new WebSocket(WS_SERVER_URL);
+
+            wsConnection.onopen = function() {
+                console.log("⚡ Connected to APEX Industrial Hardware Gateway (Python Bridge)");
+                isRealtimeHardwareActive = true;
+                appendHexTerminal("[GATEWAY] Connected to Python WebSocket Bridge.");
+            };
+
+            wsConnection.onmessage = function(event) {
+                try {
+                    const telemetry = JSON.parse(event.data);
+                    if (telemetry && typeof telemetry.pv !== 'undefined' && isRealtimeHardwareActive) {
+                        // دمج البيانات الحقيقية القادمة من الـ PLC عند توفر الوسيط
+                        state.pv = telemetry.pv;
+                        state.mv = telemetry.mv;
+                    }
+                } catch (err) {
+                    console.error("Error parsing telemetry frame:", err);
+                }
+            };
+
+            wsConnection.onerror = function(error) {
+                // تراجع سلس للمحاكاة الداخلية إذا لم يكن سيرفر البايثون مشغلاً
+                isRealtimeHardwareActive = false;
+            };
+
+            wsConnection.onclose = function() {
+                isRealtimeHardwareActive = false;
+                setTimeout(initHardwareWebSocket, 4000); // محاولة إعادة الاتصال تلقائياً كل 4 ثوانٍ
+            };
+        }
+
+        // تفعيل محاولة ربط الويب سوكت في الخلفية
+        window.addEventListener('load', () => {
+            initHardwareWebSocket();
+        });
+        // ----------------------------------------------------
+
         // 60FPS Physics, PID, and Visualization Engine
         let lastTime = performance.now();
 
@@ -1310,34 +1354,32 @@
             lastTime = currentTime;
 
             if (!state.isEstop) {
-                // PID Calculation
-                const error = state.sp - state.pv;
-                state.integral += error * dt;
-                // Anti-windup clamping
-                state.integral = Math.max(-40, Math.min(40, state.integral));
-                const derivative = (state.pv - state.lastPv) / dt;
-                state.lastPv = state.pv;
+                // PID Calculation (تتم محلياً إذا لم يكن هناك وسيط هاردوير نشط)
+                if (!isRealtimeHardwareActive) {
+                    const error = state.sp - state.pv;
+                    state.integral += error * dt;
+                    state.integral = Math.max(-40, Math.min(40, state.integral));
+                    const derivative = (state.pv - state.lastPv) / dt;
+                    state.lastPv = state.pv;
 
-                let output = (state.kp * error) + (state.ki * state.integral) - (state.kd * derivative);
-                state.mv = Math.max(0.0, Math.min(100.0, output));
+                    let output = (state.kp * error) + (state.ki * state.integral) - (state.kd * derivative);
+                    state.mv = Math.max(0.0, Math.min(100.0, output));
 
-                // Process Physics (First-Order Lag with Inertia Tau)
-                const dpv = ((state.mv + state.disturbance) - state.pv) / state.tau * dt;
-                state.pv += dpv;
-                state.disturbance *= 0.96; // Dissipate shock
+                    const dpv = ((state.mv + state.disturbance) - state.pv) / state.tau * dt;
+                    state.pv += dpv;
+                    state.disturbance *= 0.96;
+                }
             } else {
                 state.mv = 0.0;
-                state.pv += (0.0 - state.pv) / 4.0 * dt; // Gravity drain
+                state.pv += (0.0 - state.pv) / 4.0 * dt;
             }
 
-            // Optional Gaussian Noise
             let renderedPv = state.pv;
             if (state.noise) {
                 renderedPv += (Math.random() - 0.5) * 0.8;
             }
             renderedPv = Math.max(0.0, Math.min(100.0, renderedPv));
 
-            // Record History Buffer
             state.history.push({ sp: state.sp, pv: renderedPv, mv: state.mv });
             if (state.history.length > 250) state.history.shift();
 
@@ -1348,7 +1390,6 @@
             const liquidY = 195 - liquidLevelH;
             const spY = 195 - (state.sp / 100) * tankH;
 
-            // Generate Animated Liquid Wave
             const w1 = Math.sin(state.waveOffset) * 3;
             const w2 = Math.cos(state.waveOffset * 1.5) * 3;
             const wavePath = `M 120,${liquidY} Q 175,${liquidY + w1} 230,${liquidY} T 340,${liquidY + w2} L 340,195 L 120,195 Z`;
@@ -1356,27 +1397,23 @@
             document.getElementById('surfaceGlowLine').setAttribute('y1', liquidY);
             document.getElementById('surfaceGlowLine').setAttribute('y2', liquidY);
 
-            // Setpoint Laser Line
             document.getElementById('svgSpLine').setAttribute('y1', spY);
             document.getElementById('svgSpLine').setAttribute('y2', spY);
             document.getElementById('svgSpTagBg').setAttribute('y', spY - 10);
             document.getElementById('svgSpTagText').setAttribute('y', spY + 4);
             document.getElementById('svgSpTagText').textContent = `SP ${state.sp.toFixed(0)}%`;
 
-            // Valve Throttle Rotation & Glow
             const valveAngle = (state.mv / 100) * 90;
             document.getElementById('valveStem').setAttribute('transform', `rotate(${valveAngle})`);
             document.getElementById('valveAura').style.opacity = (0.2 + (state.mv / 100) * 0.8).toFixed(2);
             document.getElementById('valveThrottleText').textContent = `MV ${state.mv.toFixed(0)}%`;
 
-            // Synoptic Readouts
             document.getElementById('synopticPvText').textContent = renderedPv.toFixed(2);
             const errDelta = state.sp - renderedPv;
             const errElem = document.getElementById('synopticErrText');
             errElem.textContent = (errDelta >= 0 ? '+' : '') + errDelta.toFixed(2) + '%';
             errElem.style.color = Math.abs(errDelta) < 2 ? 'var(--emerald-online)' : 'var(--amber-sp)';
 
-            // Status Beacon
             const beaconLed = document.getElementById('beaconLed');
             const beaconText = document.getElementById('beaconText');
             if (state.isEstop) {
@@ -1390,7 +1427,7 @@
             }
 
             // 2. Update Radial Dials
-            const arcLength = 236; // Pi * radius (approx)
+            const arcLength = 236;
             const pvOffset = arcLength - (renderedPv / 100) * arcLength;
             const mvOffset = arcLength - (state.mv / 100) * arcLength;
             document.getElementById('gaugePvArc').style.strokeDashoffset = pvOffset;
@@ -1398,7 +1435,6 @@
             document.getElementById('gaugePvText').textContent = renderedPv.toFixed(1) + '%';
             document.getElementById('gaugeMvText').textContent = state.mv.toFixed(1) + '%';
 
-            // SP Needle in PV Gauge
             const spAngle = -180 + (state.sp / 100) * 180;
             document.getElementById('gaugeSpNeedle').setAttribute('transform', `rotate(${spAngle} 100 110)`);
 
@@ -1459,7 +1495,6 @@
             const h = canvas.height;
             ctx.clearRect(0, 0, w, h);
 
-            // Background Grid Lines
             ctx.lineWidth = 1;
             ctx.strokeStyle = '#0F1827';
             for (let x = 0; x < w; x += 40) {
@@ -1479,7 +1514,6 @@
             if (pts.length < 2) return;
             const dx = w / (pts.length - 1);
 
-            // 1. Draw MV Filled Area (Orange Glow)
             ctx.beginPath();
             ctx.moveTo(0, h);
             for (let i = 0; i < pts.length; i++) {
@@ -1491,7 +1525,6 @@
             ctx.fillStyle = 'rgba(255, 61, 0, 0.08)';
             ctx.fill();
 
-            // MV Line Stroke
             ctx.beginPath();
             for (let i = 0; i < pts.length; i++) {
                 const y = h - (pts[i].mv / 100) * (h - 10) - 5;
@@ -1501,7 +1534,6 @@
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // 2. Draw SP Reference Line (Amber Dashed)
             ctx.beginPath();
             ctx.setLineDash([5, 4]);
             for (let i = 0; i < pts.length; i++) {
@@ -1513,7 +1545,6 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // 3. Draw PV Process Value Line (Cyan Glowing Beam)
             ctx.beginPath();
             for (let i = 0; i < pts.length; i++) {
                 const y = h - (pts[i].pv / 100) * (h - 10) - 5;
@@ -1524,7 +1555,7 @@
             ctx.shadowColor = '#00E5FF';
             ctx.shadowBlur = 8;
             ctx.stroke();
-            ctx.shadowBlur = 0; // reset
+            ctx.shadowBlur = 0;
         }
 
         // CSV Historian Downloader
