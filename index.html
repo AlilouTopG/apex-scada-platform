@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX-SCADA // NEXT-GEN EDGE AUTOMATION OS</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --bg-base: #030508;
+            --bg-surface: #070B12;
+            --bg-card: #0A0F1A;
+            --bg-elevated: #0F1626;
+            --border-dim: #131E33;
+            --border-active: #1D2D4D;
+            --cyan-primary: #00E5FF;
+            --cyan-glow: rgba(0, 229, 255, 0.4);
+            --orange-alert: #FF3D00;
+            --orange-glow: rgba(255, 61, 0, 0.45);
+            --emerald-online: #00E676;
+            --emerald-glow: rgba(0, 230, 118, 0.4);
+            --amber-sp: #FFD700;
+            --amber-glow: rgba(255, 215, 0, 0.4);
+            --red-estop: #FF1744;
+            --text-primary: #E2E8F0;
+            --text-muted: #64748B;
+            --text-dim: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.04) 0%, transparent 60%),
+                linear-gradient(rgba(19, 30, 51, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(19, 30, 51, 0.3) 1px, transparent 1px);
+            background-size: 100% 100%, 32px 32px, 32px 32px;
+        }
+
+        /* Subtle Scanline Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.4;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-active);
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan-primary);
+        }
+
+        /* Header Cockpit */
+        header.cockpit-bar {
+            height: 54px;
+            background: rgba(7, 11, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--cyan-primary), #0052cc);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            box-shadow: 0 0 12px var(--cyan-glow);
+        }
+
+        .brand-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #fff;
+        }
+
+        .brand-version {
+            font-size: 0.65rem;
+            color: var(--cyan-primary);
+            background: rgba(0, 229, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 229, 255, 0.25);
+        }
+
+        .header-metrics {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.8rem;
+        }
+
+        .telemetry-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            color: var(--emerald-online);
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--emerald-online);
+            box-shadow: 0 0 8px var(--emerald-online);
+            animation: pulse-glow 1.2s infinite alternate;
+        }
+
+        .pulse-dot.danger {
+            background: var(--red-estop) !important;
+            box-shadow: 0 0 12px var(--red-estop) !important;
+        }
+
+        @keyframes pulse-glow {
+            from { opacity: 0.4; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1.15); }
+        }
+
+        .audio-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-active);
+            color: var(--text-muted);
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .audio-toggle-btn.active {
+            color: var(--cyan-primary);
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 8px var(--cyan-glow);
+        }
+
+        /* Main Workspace Layout */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            flex: 1;
+            height: calc(100vh - 54px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 310px 1fr;
+            }
+        }
+
+        /* Sidebar Control Center */
+        aside.tactical-sidebar {
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-dim);
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 3px; height: 100%;
+            background: var(--border-active);
+        }
+        .card-panel.cyan-accent::before { background: var(--cyan-primary); }
+        .card-panel.orange-accent::before { background: var(--orange-alert); }
+        .card-panel.emerald-accent::before { background: var(--emerald-online); }
+        .card-panel.red-accent::before { background: var(--red-estop); }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Heavy Industrial E-STOP Button */
+        .estop-button {
+            width: 100%;
+            height: 52px;
+            background: linear-gradient(180deg, #991B1B 0%, #450A0A 100%);
+            border: 2px solid var(--red-estop);
+            border-radius: 8px;
+            color: #FFF;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .estop-button:hover {
+            background: linear-gradient(180deg, #B91C1C 0%, #7F1D1D 100%);
+            box-shadow: 0 0 30px rgba(255, 23, 68, 0.7), inset 0 2px 6px rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .estop-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 10px rgba(255, 23, 68, 0.3);
+        }
+
+        .estop-button.latched {
+            background: #1A0507;
+            border-color: #550D15;
+            color: #7F1D1D;
+            box-shadow: none;
+        }
+
+        .reset-estop-btn {
+            margin-top: 8px;
+            width: 100%;
+            padding: 8px;
+            background: #0B1424;
+            border: 1px solid var(--border-active);
+            color: var(--cyan-primary);
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+        .reset-estop-btn.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .reset-estop-btn:hover {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: var(--cyan-primary);
+        }
+
+        /* Preset & Mode Switcher */
+        .segmented-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            background: var(--bg-surface);
+            padding: 3px;
+            border-radius: 6px;
+            border: 1px solid var(--border-dim);
+            margin-bottom: 10px;
+        }
+
+        .segment-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 8px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .segment-btn.active {
+            background: var(--border-active);
+            color: #FFF;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .select-input {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-dim);
+            color: #FFF;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .select-input:focus {
+            border-color: var(--cyan-primary);
+        }
+
+        /* Dynamic Setpoint Slider & Inputs */
+        .slider-wrapper {
+            margin: 12px 0 6px 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        .range-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #141D2D;
+            border-radius: 3px;
+            outline: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--amber-sp);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--amber-glow);
+            transition: transform 0.1s;
+        }
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .quick-chips {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .chip-btn {
+            flex: 1;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: var(--amber-sp);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .chip-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: var(--amber-sp);
+        }
+
+        /* PID Tuning Grid */
+        .pid-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .pid-cell {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-dim);
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .pid-cell label {
+            display: block;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .pid-cell input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #FFF;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+        }
+
+        /* Disturbance Injection Buttons */
+        .disturbance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .disturb-btn {
+            background: #141B29;
+            border: 1px solid var(--border-active);
+            color: var(--orange-alert);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .disturb-btn:hover {
+            background: rgba(255, 61, 0, 0.15);
+            border-color: var(--orange-alert);
+            box-shadow: 0 0 10px var(--orange-glow);
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Main Cockpit Body */
+        main.cockpit-view {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        /* ISA 18.2 Alarm Ribbon */
+        .alarm-annunciator {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alarm-matrix {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alarm-box {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: #0B101A;
+            border: 1px solid #19253B;
+            color: #475569;
+            transition: all 0.25s;
+        }
+
+        .alarm-box.active-critical {
+            background: rgba(255, 23, 68, 0.2);
+            border-color: var(--red-estop);
+            color: #FF5252;
+            box-shadow: 0 0 12px rgba(255, 23, 68, 0.5);
+            animation: alarm-flash 0.8s infinite alternate;
+        }
+
+        .alarm-box.active-warning {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: var(--amber-sp);
+            color: var(--amber-sp);
+            box-shadow: 0 0 10px var(--amber-glow);
+        }
+
+        @keyframes alarm-flash {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .ack-btn {
+            background: #131E33;
+            border: 1px solid var(--border-active);
+            color: #FFF;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ack-btn:hover {
+            background: var(--border-active);
+            border-color: var(--cyan-primary);
+        }
+
+        /* Twin & Gauges Dual Panel */
+        .twin-dashboard-row {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 1400px) {
+            .twin-dashboard-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SVG Synoptic Twin */
+        .synoptic-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 12px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .synoptic-svg-wrap {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Gauges Cluster */
+        .gauges-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gauges-duo {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex: 1;
+        }
+
+        .gauge-module {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .gauge-svg {
+            width: 180px;
+            height: 115px;
+        }
+
+        .gauge-val-display {
+            margin-top: -24px;
+            text-align: center;
+        }
+
+        .gauge-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .gauge-sub {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Oscilloscope Plot */
+        .oscilloscope-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .oscillo-canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 190px;
+        }
+
+        canvas#scopeCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 4px;
+            background: #05080E;
+        }
+
+        /* Bottom Gateway & Hex Matrix */
+        .gateway-bottom-row {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 1300px) {
+            .gateway-bottom-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .gateway-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        table.modbus-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.72rem;
+            text-align: left;
+        }
+
+        table.modbus-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        table.modbus-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(19, 30, 51, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-box {
+            background: #030509;
+            border: 1px solid var(--border-dim);
+            border-radius: 6px;
+            padding: 8px 10px;
+            height: 140px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.70rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hex-line {
+            line-height: 1.4;
+        }
+        .hex-line.tx { color: var(--amber-sp); }
+        .hex-line.rx { color: var(--cyan-primary); }
+        .hex-line.sys { color: var(--text-muted); }
+
+        .btn-export {
+            background: #0E1626;
+            border: 1px solid var(--border-active);
+            color: #FFF;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-export:hover {
+            border-color: var(--emerald-online);
+            color: var(--emerald-online);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Cockpit Header -->
+    <header class="cockpit-bar">
+        <div class="brand-cluster">
+            <div class="brand-icon">
+                <i data-lucide="cpu" style="width: 18px; height: 18px;"></i>
+            </div>
+            <div class="brand-title mono">APEX-SCADA <span style="font-weight:300; opacity:0.6;">//</span> EDGE OS</div>
+            <span class="brand-version mono">HIL-v4.8</span>
+        </div>
+
+        <div class="header-metrics mono">
+            <div class="telemetry-badge" id="telemetryBadge">
+                <span class="pulse-dot" id="headerPulse"></span>
+                <span id="telemetryStateText">TELEMETRY: ACTIVE (60 FPS)</span>
+            </div>
+            <div style="color: var(--text-muted);">
+                SYS_CLK: <span id="clockDisplay" style="color: #FFF;">00:00:00</span>
+            </div>
+            <div style="color: var(--text-muted);">
+                RTT: <span style="color: var(--cyan-primary);">2.4ms</span>
+            </div>
+            <button class="audio-toggle-btn" id="audioToggle" title="Toggle Synthesized HMI Audio">
+                <i data-lucide="volume-2" style="width: 16px; height: 16px;"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="workspace-grid">
+        
+        <!-- Left Tactical Control Sidebar -->
+        <aside class="tactical-sidebar">
+            
+            <!-- E-STOP Module -->
+            <div class="card-panel red-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i> CRITICAL SAFETY</span>
+                    <span id="estopLed" style="font-size: 0.65rem; color: var(--emerald-online);" class="mono">ARMED</span>
+                </div>
+                <button class="estop-button mono" id="btnEstop">
+                    <i data-lucide="octagon" style="width: 20px; height: 20px;"></i>
+                    EMERGENCY STOP
+                </button>
+                <button class="reset-estop-btn mono" id="btnResetEstop">
+                    <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i> RESET SAFETY LATCH
+                </button>
+            </div>
+
+            <!-- Pipeline & Plant Presets -->
+            <div class="card-panel cyan-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="layers" style="width: 14px; height: 14px;"></i> CONTROL PIPELINE</span>
+                </div>
+                
+                <div class="segmented-selector">
+                    <button class="segment-btn active" id="btnModeSim">DIGITAL TWIN</button>
+                    <button class="segment-btn" id="btnModeHIL">MODBUS HIL</button>
+                </div>
+
+                <label style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px; display: block;" class="mono">PROCESS DYNAMICS MODEL</label>
+                <select class="select-input mono" id="plantPresetSelect">
+                    <option value="tank">Fluid Level Tank (Equilibrium)</option>
+                    <option value="oven">Thermal Industrial Oven (High Inertia)</option>
+                    <option value="motor">High-Speed DC Motor (Rapid)</option>
+                </select>
+            </div>
+
+            <!-- Setpoint Control -->
+            <div class="card-panel" style="border-left: 3px solid var(--amber-sp);">
+                <div class="panel-header">
+                    <span class="panel-title mono" style="color: var(--amber-sp);"><i data-lucide="crosshair" style="width: 14px; height: 14px;"></i> TARGET SETPOINT (SP)</span>
+                    <span class="mono" id="spDisplayValue" style="color: var(--amber-sp); font-weight: 800; font-size: 1rem;">65.0%</span>
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" class="range-slider" id="spRange" min="0" max="100" value="65" step="0.5">
+                </div>
+                <div class="quick-chips">
+                    <button class="chip-btn mono" onclick="setSP(25)">25%</button>
+                    <button class="chip-btn mono" onclick="setSP(50)">50%</button>
+                    <button class="chip-btn mono" onclick="setSP(75)">75%</button>
+                    <button class="chip-btn mono" onclick="setSP(90)">90%</button>
+                </div>
+            </div>
+
+            <!-- Industrial PID Controller Tuning -->
+            <div class="card-panel">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="sliders" style="width: 14px; height: 14px;"></i> PID TUNING MATRIX</span>
+                    <span style="font-size: 0.65rem; color: var(--text-muted);" class="mono">SAMPLE: 16ms</span>
+                </div>
+                <div class="pid-grid">
+                    <div class="pid-cell">
+                        <label class="mono">PROPORTIONAL (Kp)</label>
+                        <input type="number" id="inputKp" step="0.1" value="2.6">
+                    </div>
+                    <div class="pid-cell">
+                        <label class="mono">INTEGRAL (Ki)</label>
+                        <input type="number" id="inputKi" step="0.05" value="0.75">
+                    </div>
+                    <div class="pid-cell">
+                        <label class="mono">DERIVATIVE (Kd)</label>
+                        <input type="number" id="inputKd" step="0.01" value="0.15">
+                    </div>
+                    <div class="pid-cell">
+                        <label class="mono">INERTIA (Tau)</label>
+                        <input type="number" id="inputTau" step="0.1" value="2.5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load Disturbance & Diagnostics -->
+            <div class="card-panel orange-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="zap" style="width: 14px; height: 14px;"></i> STRESS INJECTION</span>
+                </div>
+                <div class="disturbance-grid">
+                    <button class="disturb-btn mono" id="btnShockPos">+20% SHOCK</button>
+                    <button class="disturb-btn mono" id="btnShockNeg">-20% DROP</button>
+                </div>
+                <div class="toggle-row mono">
+                    <span>SENSOR GAUSSIAN NOISE</span>
+                    <input type="checkbox" id="checkNoise" style="cursor: pointer;">
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Center Supervisory Cockpit Area -->
+        <main class="cockpit-view">
+            
+            <!-- ISA 18.2 Annunciator Ribbon -->
+            <div class="alarm-annunciator">
+                <div class="alarm-matrix mono">
+                    <div class="alarm-box" id="alarmHH">HI-HI (90%)</div>
+                    <div class="alarm-box" id="alarmDEV">DEVIATION (&gt;15%)</div>
+                    <div class="alarm-box" id="alarmNORM" style="background: rgba(0, 230, 118, 0.1); border-color: var(--emerald-online); color: var(--emerald-online);">SYSTEM NORMAL</div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn-export mono" id="btnExportLog">
+                        <i data-lucide="download" style="width: 13px; height: 13px;"></i> CSV LOG
+                    </button>
+                    <button class="ack-btn mono" id="btnAck">ACK ALARM</button>
+                </div>
+            </div>
+
+            <!-- Twin & Gauges Dual Panel -->
+            <div class="twin-dashboard-row">
+                
+                <!-- Dynamic SVG Synoptic Twin -->
+                <div class="synoptic-card cyan-accent">
+                    <div class="panel-header">
+                        <span class="panel-title mono"><i data-lucide="box" style="width: 14px; height: 14px;"></i> SYNOPTIC DIGITAL TWIN // PROCESS TANK</span>
+                        <span class="mono" style="color: var(--cyan-primary); font-size: 0.7rem;" id="twinStatusTag">60 FPS REAL-TIME</span>
+                    </div>
+                    
+                    <div class="synoptic-svg-wrap">
+                        <svg viewBox="0 0 680 230" style="width: 100%; height: 100%;">
+                            <defs>
+                                <linearGradient id="tankShell" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#080E18"/>
+                                    <stop offset="100%" stop-color="#121C2F"/>
+                                </linearGradient>
+                                <linearGradient id="fluidColor" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.85"/>
+                                    <stop offset="100%" stop-color="#0052CC" stop-opacity="0.95"/>
+                                </linearGradient>
+                                <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                                </filter>
+                                <filter id="glowOrange" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                                </filter>
+                                <clipPath id="tankInnerClip">
+                                    <rect x="120" y="35" width="220" height="160" rx="8"/>
+                                </clipPath>
+                            </defs>
+
+                            <!-- Tank Shell -->
+                            <rect x="120" y="35" width="220" height="160" rx="8" fill="url(#tankShell)" stroke="#1D2E4D" stroke-width="2"/>
+                            
+                            <!-- Liquid Body with Wave Simulation -->
+                            <g clip-path="url(#tankInnerClip)">
+                                <path id="fluidWavePath" fill="url(#fluidColor)" d="M 120,120 Q 175,115 230,120 T 340,120 L 340,200 L 120,200 Z"/>
+                                <line id="surfaceGlowLine" x1="120" y1="120" x2="340" y2="120" stroke="#00E5FF" stroke-width="3" filter="url(#glowCyan)" opacity="0.8"/>
+                            </g>
+
+                            <!-- Target Setpoint Laser Reference -->
+                            <line id="svgSpLine" x1="120" y1="95" x2="340" y2="95" stroke="#FFD700" stroke-width="2" stroke-dasharray="6,4" filter="url(#glowCyan)"/>
+                            <rect id="svgSpTagBg" x="346" y="85" width="62" height="20" rx="4" fill="#0A0F1A" stroke="#FFD700" stroke-width="1"/>
+                            <text id="svgSpTagText" x="377" y="99" text-anchor="middle" fill="#FFD700" font-family="JetBrains Mono" font-size="10" font-weight="700">SP 65%</text>
+
+                            <!-- Inflow Pipe (Left) -->
+                            <rect x="30" y="95" width="90" height="18" rx="2" fill="#0C1322" stroke="#1D2E4D" stroke-width="1"/>
+                            <text x="75" y="88" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono" font-size="8">FEED IN</text>
+
+                            <!-- Control Pneumatic Valve -->
+                            <g transform="translate(75, 104)">
+                                <circle id="valveAura" cx="0" cy="0" r="17" fill="#090E17" stroke="#FF3D00" stroke-width="2" filter="url(#glowOrange)"/>
+                                <line id="valveStem" x1="-11" y1="-11" x2="11" y2="11" stroke="#FF3D00" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="0" cy="0" r="4" fill="#FF3D00"/>
+                            </g>
+                            <text id="valveThrottleText" x="75" y="136" text-anchor="middle" fill="#FF3D00" font-family="JetBrains Mono" font-size="9" font-weight="700">MV 65%</text>
+
+                            <!-- Outflow Pipe (Right) -->
+                            <rect x="340" y="95" width="80" height="18" rx="2" fill="#0C1322" stroke="#1D2E4D" stroke-width="1"/>
+                            <polygon points="420,95 432,104 420,113" fill="#1D2E4D"/>
+                            <text x="380" y="88" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono" font-size="8">OUTFLOW</text>
+
+                            <!-- Digital Telemetry Badges in Synoptic -->
+                            <rect x="460" y="40" width="190" height="60" rx="6" fill="#070C15" stroke="#00E5FF" stroke-width="1"/>
+                            <text x="475" y="58" fill="#64748B" font-family="JetBrains Mono" font-size="8" letter-spacing="1">PROCESS LEVEL (PV)</text>
+                            <text id="synopticPvText" x="475" y="88" fill="#00E5FF" font-family="JetBrains Mono" font-size="28" font-weight="800" filter="url(#glowCyan)">65.00</text>
+                            <text x="590" y="88" fill="#00E5FF" font-family="JetBrains Mono" font-size="14">%</text>
+
+                            <rect x="460" y="112" width="190" height="42" rx="6" fill="#070C15" stroke="#1D2E4D" stroke-width="1"/>
+                            <circle id="beaconLed" cx="480" cy="133" r="5" fill="#00E676"/>
+                            <text id="beaconText" x="495" y="137" fill="#00E676" font-family="JetBrains Mono" font-size="11" font-weight="700">OPERATIONAL</text>
+
+                            <rect x="460" y="162" width="190" height="34" rx="6" fill="#070C15" stroke="#1D2E4D" stroke-width="1"/>
+                            <text x="475" y="183" fill="#64748B" font-family="JetBrains Mono" font-size="9">ERR (SP-PV)</text>
+                            <text id="synopticErrText" x="635" y="183" text-anchor="end" fill="#00E676" font-family="JetBrains Mono" font-size="12" font-weight="700">+0.00%</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Dual Radial Gauges Module -->
+                <div class="gauges-card orange-accent">
+                    <div class="panel-header">
+                        <span class="panel-title mono"><i data-lucide="gauge" style="width: 14px; height: 14px;"></i> ANALOG ACTUATION & TELEMETRY DIALS</span>
+                    </div>
+
+                    <div class="gauges-duo">
+                        <!-- PV Semi-circular Gauge -->
+                        <div class="gauge-module">
+                            <svg class="gauge-svg" viewBox="0 0 200 125">
+                                <path d="M 25 110 A 75 75 0 0 1 175 110" fill="none" stroke="#131F33" stroke-width="16" stroke-linecap="round"/>
+                                <path id="gaugePvArc" d="M 25 110 A 75 75 0 0 1 175 110" fill="none" stroke="#00E5FF" stroke-width="16" stroke-linecap="round" stroke-dasharray="236" stroke-dashoffset="100"/>
+                                <line id="gaugeSpNeedle" x1="100" y1="110" x2="100" y2="30" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                            <div class="gauge-val-display mono">
+                                <div class="gauge-number" id="gaugePvText" style="color: var(--cyan-primary);">65.0%</div>
+                                <div class="gauge-sub">PROCESS VALUE (PV)</div>
+                            </div>
+                        </div>
+
+                        <!-- MV Semi-circular Gauge -->
+                        <div class="gauge-module">
+                            <svg class="gauge-svg" viewBox="0 0 200 125">
+                                <path d="M 25 110 A 75 75 0 0 1 175 110" fill="none" stroke="#131F33" stroke-width="16" stroke-linecap="round"/>
+                                <path id="gaugeMvArc" d="M 25 110 A 75 75 0 0 1 175 110" fill="none" stroke="#FF3D00" stroke-width="16" stroke-linecap="round" stroke-dasharray="236" stroke-dashoffset="100"/>
+                            </svg>
+                            <div class="gauge-val-display mono">
+                                <div class="gauge-number" id="gaugeMvText" style="color: var(--orange-alert);">65.0%</div>
+                                <div class="gauge-sub">ACTUATOR EFFORT (MV)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Real-time 60FPS Oscilloscope -->
+            <div class="oscilloscope-card cyan-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="activity" style="width: 14px; height: 14px;"></i> 60FPS HIGH-FREQUENCY REAL-TIME OSCILLOSCOPE</span>
+                    <div class="mono" style="font-size: 0.7rem; display: flex; gap: 14px;">
+                        <span style="color: var(--amber-sp);">● SP TARGET</span>
+                        <span style="color: var(--cyan-primary);">● PV PROCESS</span>
+                        <span style="color: var(--orange-alert);">● MV ACTUATOR</span>
+                    </div>
+                </div>
+                <div class="oscillo-canvas-wrap">
+                    <canvas id="scopeCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Bottom Gateway & Hex Matrix -->
+            <div class="gateway-bottom-row">
+                
+                <!-- Modbus TCP Holding Registers -->
+                <div class="gateway-card emerald-accent">
+                    <div class="panel-header">
+                        <span class="panel-title mono"><i data-lucide="network" style="width: 14px; height: 14px;"></i> MODBUS TCP HOLDING REGISTERS MATRIX (SLAVE ID: 1)</span>
+                        <span class="mono" style="font-size: 0.65rem; color: var(--emerald-online);">FC 03 / FC 06 SYNC</span>
+                    </div>
+                    <table class="modbus-table">
+                        <thead>
+                            <tr>
+                                <th>ADDR</th>
+                                <th>TAG IDENTIFIER</th>
+                                <th>RAW COUNT (0-27648)</th>
+                                <th>SCALED %</th>
+                                <th>ACCESS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modbusTableBody">
+                            <tr>
+                                <td>40001</td>
+                                <td>PV_TRANSMITTER</td>
+                                <td id="mbRawPv">17971</td>
+                                <td id="mbScaledPv" style="color: var(--cyan-primary);">65.00%</td>
+                                <td>READ (FC 03)</td>
+                            </tr>
+                            <tr>
+                                <td>40002</td>
+                                <td>MV_VALVE_OUT</td>
+                                <td id="mbRawMv">17971</td>
+                                <td id="mbScaledMv" style="color: var(--orange-alert);">65.00%</td>
+                                <td>WRITE (FC 06)</td>
+                            </tr>
+                            <tr>
+                                <td>40003</td>
+                                <td>SP_REFERENCE</td>
+                                <td id="mbRawSp">17971</td>
+                                <td id="mbScaledSp" style="color: var(--amber-sp);">65.00%</td>
+                                <td>R / W</td>
+                            </tr>
+                            <tr>
+                                <td>40004</td>
+                                <td>SYSTEM_STATUS_WORD</td>
+                                <td>0x0001</td>
+                                <td style="color: var(--emerald-online);">STATE_OK</td>
+                                <td>READ (FC 03)</td>
+                            </tr>
+                            <tr>
+                                <td>40005</td>
+                                <td>ALARM_INTERLOCK_WORD</td>
+                                <td id="mbRawAlarm">0x0000</td>
+                                <td id="mbScaledAlarm" style="color: var(--emerald-online);">CLEAR</td>
+                                <td>READ (FC 03)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Hex Packet Sniffer Terminal -->
+                <div class="gateway-card">
+                    <div class="panel-header">
+                        <span class="panel-title mono"><i data-lucide="terminal" style="width: 14px; height: 14px;"></i> LIVE HEX PACKET SNIFFER (TCP STREAM)</span>
+                        <span class="mono" style="font-size: 0.65rem; color: var(--cyan-primary);">PORT 5020</span>
+                    </div>
+                    <div class="terminal-box" id="hexTerminal">
+                        <div class="hex-line sys">[SYSTEM INIT] Modbus TCP Gateway active. Polling slave 1.</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Lucide Icons Initialization
+        lucide.createIcons();
+
+        // System Audio Synthesizer (Web Audio API)
+        let audioCtx = null;
+        let audioMuted = true;
+        const audioBtn = document.getElementById('audioToggle');
+
+        function playIndustrialBeep(freq = 440, type = 'sine', duration = 0.08) {
+            if (audioMuted) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        audioBtn.addEventListener('click', () => {
+            audioMuted = !audioMuted;
+            audioBtn.classList.toggle('active', !audioMuted);
+            playIndustrialBeep(880, 'sine', 0.1);
+        });
+
+        // Clock Update
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // SCADA Simulation State
+        const state = {
+            isRunning: true,
+            isEstop: false,
+            mode: 'sim', // 'sim' | 'hil'
+            sp: 65.0,
+            pv: 0.0,
+            mv: 0.0,
+            integral: 0.0,
+            lastPv: 0.0,
+            kp: 2.6,
+            ki: 0.75,
+            kd: 0.15,
+            tau: 2.5,
+            disturbance: 0.0,
+            noise: false,
+            history: [],
+            waveOffset: 0
+        };
+
+        // Presets Definition
+        const presets = {
+            tank: { kp: 2.6, ki: 0.75, kd: 0.15, tau: 2.5, sp: 65.0 },
+            oven: { kp: 4.5, ki: 0.25, kd: 0.85, tau: 8.0, sp: 80.0 },
+            motor: { kp: 1.2, ki: 1.80, kd: 0.02, tau: 0.7, sp: 50.0 }
+        };
+
+        // Input Bindings
+        const spRange = document.getElementById('spRange');
+        const spDisplay = document.getElementById('spDisplayValue');
+        const inputKp = document.getElementById('inputKp');
+        const inputKi = document.getElementById('inputKi');
+        const inputKd = document.getElementById('inputKd');
+        const inputTau = document.getElementById('inputTau');
+        const checkNoise = document.getElementById('checkNoise');
+        const presetSelect = document.getElementById('plantPresetSelect');
+        const btnModeSim = document.getElementById('btnModeSim');
+        const btnModeHIL = document.getElementById('btnModeHIL');
+
+        function setSP(val) {
+            state.sp = val;
+            spRange.value = val;
+            spDisplay.textContent = val.toFixed(1) + '%';
+            playIndustrialBeep(520, 'sine', 0.05);
+        }
+
+        spRange.addEventListener('input', (e) => {
+            setSP(parseFloat(e.target.value));
+        });
+
+        inputKp.addEventListener('change', (e) => state.kp = parseFloat(e.target.value) || 0.1);
+        inputKi.addEventListener('change', (e) => state.ki = parseFloat(e.target.value) || 0.0);
+        inputKd.addEventListener('change', (e) => state.kd = parseFloat(e.target.value) || 0.0);
+        inputTau.addEventListener('change', (e) => state.tau = parseFloat(e.target.value) || 0.5);
+        checkNoise.addEventListener('change', (e) => state.noise = e.target.checked);
+
+        presetSelect.addEventListener('change', (e) => {
+            const p = presets[e.target.value];
+            state.kp = p.kp; state.ki = p.ki; state.kd = p.kd; state.tau = p.tau;
+            setSP(p.sp);
+            inputKp.value = p.kp; inputKi.value = p.ki; inputKd.value = p.kd; inputTau.value = p.tau;
+            playIndustrialBeep(640, 'triangle', 0.09);
+        });
+
+        btnModeSim.addEventListener('click', () => {
+            state.mode = 'sim';
+            btnModeSim.classList.add('active');
+            btnModeHIL.classList.remove('active');
+            appendHexTerminal('SYSTEM: Switched to In-Process Digital Twin Simulation.');
+        });
+
+        btnModeHIL.addEventListener('click', () => {
+            state.mode = 'hil';
+            btnModeHIL.classList.add('active');
+            btnModeSim.classList.remove('active');
+            appendHexTerminal('GATEWAY: Modbus TCP (HIL) Master activated on port 5020.');
+            playIndustrialBeep(700, 'square', 0.08);
+        });
+
+        // Disturbance Handlers
+        document.getElementById('btnShockPos').addEventListener('click', () => {
+            state.disturbance += 25.0;
+            playIndustrialBeep(320, 'sawtooth', 0.15);
+        });
+        document.getElementById('btnShockNeg').addEventListener('click', () => {
+            state.disturbance -= 25.0;
+            playIndustrialBeep(280, 'sawtooth', 0.15);
+        });
+
+        // E-STOP Logic
+        const btnEstop = document.getElementById('btnEstop');
+        const btnResetEstop = document.getElementById('btnResetEstop');
+        const estopLed = document.getElementById('estopLed');
+        const headerPulse = document.getElementById('headerPulse');
+        const telemetryStateText = document.getElementById('telemetryStateText');
+
+        btnEstop.addEventListener('click', () => {
+            state.isEstop = true;
+            btnEstop.classList.add('latched');
+            btnResetEstop.classList.add('visible');
+            estopLed.textContent = 'TRIPPED';
+            estopLed.style.color = 'var(--red-estop)';
+            headerPulse.classList.add('danger');
+            telemetryStateText.textContent = 'E-STOP LATCHED // ACTUATOR LOCKED';
+            telemetryStateText.style.color = 'var(--red-estop)';
+            playIndustrialBeep(180, 'sawtooth', 0.4);
+            appendHexTerminal('[CRITICAL] EMERGENCY STOP TRIGGERED. Holding register 40002 clamped to 0.');
+        });
+
+        btnResetEstop.addEventListener('click', () => {
+            state.isEstop = false;
+            btnEstop.classList.remove('latched');
+            btnResetEstop.classList.remove('visible');
+            estopLed.textContent = 'ARMED';
+            estopLed.style.color = 'var(--emerald-online)';
+            headerPulse.classList.remove('danger');
+            telemetryStateText.textContent = 'TELEMETRY: ACTIVE (60 FPS)';
+            telemetryStateText.style.color = 'var(--emerald-online)';
+            playIndustrialBeep(600, 'sine', 0.1);
+            appendHexTerminal('[RECOVERY] Safety interlock acknowledged and reset.');
+        });
+
+        // Canvas Setup for Oscilloscope
+        const canvas = document.getElementById('scopeCanvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Hex Terminal Logging
+        const terminal = document.getElementById('hexTerminal');
+        function appendHexTerminal(msg, type = 'sys') {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+            const line = document.createElement('div');
+            line.className = 'hex-line ' + type;
+            line.textContent = `[${timeStr}] ${msg}`;
+            terminal.appendChild(line);
+            if (terminal.childElementCount > 30) terminal.removeChild(terminal.firstChild);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Modbus Frame Generator (Every 800ms)
+        setInterval(() => {
+            if (state.isEstop) return;
+            const rawPv = Math.floor((state.pv / 100) * 27648);
+            const rawMv = Math.floor((state.mv / 100) * 27648);
+            const rawSp = Math.floor((state.sp / 100) * 27648);
+            const hexPv = rawPv.toString(16).toUpperCase().padStart(4, '0');
+            const hexMv = rawMv.toString(16).toUpperCase().padStart(4, '0');
+            const hexSp = rawSp.toString(16).toUpperCase().padStart(4, '0');
+
+            appendHexTerminal(`TX >> [00 01 00 00 00 06 01 03 00 00 00 05]`, 'tx');
+            appendHexTerminal(`RX << [00 01 00 00 00 0D 01 03 0A ${hexPv} ${hexMv} ${hexSp} 0001 0000] (2.4ms)`, 'rx');
+        }, 850);
+
+        // 60FPS Physics, PID, and Visualization Engine
+        let lastTime = performance.now();
+
+        function engineLoop(currentTime) {
+            const dt = Math.min((currentTime - lastTime) / 1000, 0.05);
+            lastTime = currentTime;
+
+            if (!state.isEstop) {
+                // PID Calculation
+                const error = state.sp - state.pv;
+                state.integral += error * dt;
+                // Anti-windup clamping
+                state.integral = Math.max(-40, Math.min(40, state.integral));
+                const derivative = (state.pv - state.lastPv) / dt;
+                state.lastPv = state.pv;
+
+                let output = (state.kp * error) + (state.ki * state.integral) - (state.kd * derivative);
+                state.mv = Math.max(0.0, Math.min(100.0, output));
+
+                // Process Physics (First-Order Lag with Inertia Tau)
+                const dpv = ((state.mv + state.disturbance) - state.pv) / state.tau * dt;
+                state.pv += dpv;
+                state.disturbance *= 0.96; // Dissipate shock
+            } else {
+                state.mv = 0.0;
+                state.pv += (0.0 - state.pv) / 4.0 * dt; // Gravity drain
+            }
+
+            // Optional Gaussian Noise
+            let renderedPv = state.pv;
+            if (state.noise) {
+                renderedPv += (Math.random() - 0.5) * 0.8;
+            }
+            renderedPv = Math.max(0.0, Math.min(100.0, renderedPv));
+
+            // Record History Buffer
+            state.history.push({ sp: state.sp, pv: renderedPv, mv: state.mv });
+            if (state.history.length > 250) state.history.shift();
+
+            // 1. Update Synoptic Twin SVG Elements
+            state.waveOffset += dt * 4;
+            const tankH = 160;
+            const liquidLevelH = (renderedPv / 100) * tankH;
+            const liquidY = 195 - liquidLevelH;
+            const spY = 195 - (state.sp / 100) * tankH;
+
+            // Generate Animated Liquid Wave
+            const w1 = Math.sin(state.waveOffset) * 3;
+            const w2 = Math.cos(state.waveOffset * 1.5) * 3;
+            const wavePath = `M 120,${liquidY} Q 175,${liquidY + w1} 230,${liquidY} T 340,${liquidY + w2} L 340,195 L 120,195 Z`;
+            document.getElementById('fluidWavePath').setAttribute('d', wavePath);
+            document.getElementById('surfaceGlowLine').setAttribute('y1', liquidY);
+            document.getElementById('surfaceGlowLine').setAttribute('y2', liquidY);
+
+            // Setpoint Laser Line
+            document.getElementById('svgSpLine').setAttribute('y1', spY);
+            document.getElementById('svgSpLine').setAttribute('y2', spY);
+            document.getElementById('svgSpTagBg').setAttribute('y', spY - 10);
+            document.getElementById('svgSpTagText').setAttribute('y', spY + 4);
+            document.getElementById('svgSpTagText').textContent = `SP ${state.sp.toFixed(0)}%`;
+
+            // Valve Throttle Rotation & Glow
+            const valveAngle = (state.mv / 100) * 90;
+            document.getElementById('valveStem').setAttribute('transform', `rotate(${valveAngle})`);
+            document.getElementById('valveAura').style.opacity = (0.2 + (state.mv / 100) * 0.8).toFixed(2);
+            document.getElementById('valveThrottleText').textContent = `MV ${state.mv.toFixed(0)}%`;
+
+            // Synoptic Readouts
+            document.getElementById('synopticPvText').textContent = renderedPv.toFixed(2);
+            const errDelta = state.sp - renderedPv;
+            const errElem = document.getElementById('synopticErrText');
+            errElem.textContent = (errDelta >= 0 ? '+' : '') + errDelta.toFixed(2) + '%';
+            errElem.style.color = Math.abs(errDelta) < 2 ? 'var(--emerald-online)' : 'var(--amber-sp)';
+
+            // Status Beacon
+            const beaconLed = document.getElementById('beaconLed');
+            const beaconText = document.getElementById('beaconText');
+            if (state.isEstop) {
+                beaconLed.setAttribute('fill', 'var(--red-estop)');
+                beaconText.textContent = 'E-STOPPED';
+                beaconText.style.color = 'var(--red-estop)';
+            } else {
+                beaconLed.setAttribute('fill', 'var(--emerald-online)');
+                beaconText.textContent = 'OPERATIONAL';
+                beaconText.style.color = 'var(--emerald-online)';
+            }
+
+            // 2. Update Radial Dials
+            const arcLength = 236; // Pi * radius (approx)
+            const pvOffset = arcLength - (renderedPv / 100) * arcLength;
+            const mvOffset = arcLength - (state.mv / 100) * arcLength;
+            document.getElementById('gaugePvArc').style.strokeDashoffset = pvOffset;
+            document.getElementById('gaugeMvArc').style.strokeDashoffset = mvOffset;
+            document.getElementById('gaugePvText').textContent = renderedPv.toFixed(1) + '%';
+            document.getElementById('gaugeMvText').textContent = state.mv.toFixed(1) + '%';
+
+            // SP Needle in PV Gauge
+            const spAngle = -180 + (state.sp / 100) * 180;
+            document.getElementById('gaugeSpNeedle').setAttribute('transform', `rotate(${spAngle} 100 110)`);
+
+            // 3. Render High-Performance Oscilloscope Canvas
+            renderScopeCanvas();
+
+            // 4. Update Modbus Registers Matrix
+            const rawPvVal = Math.floor((renderedPv / 100) * 27648);
+            const rawMvVal = Math.floor((state.mv / 100) * 27648);
+            const rawSpVal = Math.floor((state.sp / 100) * 27648);
+            document.getElementById('mbRawPv').textContent = rawPvVal;
+            document.getElementById('mbScaledPv').textContent = renderedPv.toFixed(2) + '%';
+            document.getElementById('mbRawMv').textContent = rawMvVal;
+            document.getElementById('mbScaledMv').textContent = state.mv.toFixed(2) + '%';
+            document.getElementById('mbRawSp').textContent = rawSpVal;
+            document.getElementById('mbScaledSp').textContent = state.sp.toFixed(2) + '%';
+
+            // 5. Update ISA 18.2 Alarm Annunciator
+            const alarmHH = document.getElementById('alarmHH');
+            const alarmDEV = document.getElementById('alarmDEV');
+            const alarmNORM = document.getElementById('alarmNORM');
+            const mbAlarmWord = document.getElementById('mbRawAlarm');
+            const mbAlarmScaled = document.getElementById('mbScaledAlarm');
+
+            let hasAlarm = false;
+            if (renderedPv >= 90.0) {
+                alarmHH.className = 'alarm-box active-critical';
+                hasAlarm = true;
+            } else {
+                alarmHH.className = 'alarm-box';
+            }
+
+            if (Math.abs(state.sp - renderedPv) > 15.0) {
+                alarmDEV.className = 'alarm-box active-warning';
+                hasAlarm = true;
+            } else {
+                alarmDEV.className = 'alarm-box';
+            }
+
+            if (hasAlarm) {
+                alarmNORM.style.opacity = '0.3';
+                mbAlarmWord.textContent = '0x0004';
+                mbAlarmScaled.textContent = 'ALARM_ACTIVE';
+                mbAlarmScaled.style.color = 'var(--red-estop)';
+            } else {
+                alarmNORM.style.opacity = '1';
+                mbAlarmWord.textContent = '0x0000';
+                mbAlarmScaled.textContent = 'CLEAR';
+                mbAlarmScaled.style.color = 'var(--emerald-online)';
+            }
+
+            requestAnimationFrame(engineLoop);
+        }
+
+        // High-Precision Canvas Rendering
+        function renderScopeCanvas() {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // Background Grid Lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#0F1827';
+            for (let x = 0; x < w; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            for (let y = 0; y < h; y += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            const pts = state.history;
+            if (pts.length < 2) return;
+            const dx = w / (pts.length - 1);
+
+            // 1. Draw MV Filled Area (Orange Glow)
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            for (let i = 0; i < pts.length; i++) {
+                const y = h - (pts[i].mv / 100) * (h - 10) - 5;
+                ctx.lineTo(i * dx, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 61, 0, 0.08)';
+            ctx.fill();
+
+            // MV Line Stroke
+            ctx.beginPath();
+            for (let i = 0; i < pts.length; i++) {
+                const y = h - (pts[i].mv / 100) * (h - 10) - 5;
+                if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * dx, y);
+            }
+            ctx.strokeStyle = '#FF3D00';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 2. Draw SP Reference Line (Amber Dashed)
+            ctx.beginPath();
+            ctx.setLineDash([5, 4]);
+            for (let i = 0; i < pts.length; i++) {
+                const y = h - (pts[i].sp / 100) * (h - 10) - 5;
+                if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * dx, y);
+            }
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. Draw PV Process Value Line (Cyan Glowing Beam)
+            ctx.beginPath();
+            for (let i = 0; i < pts.length; i++) {
+                const y = h - (pts[i].pv / 100) * (h - 10) - 5;
+                if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * dx, y);
+            }
+            ctx.strokeStyle = '#00E5FF';
+            ctx.lineWidth = 2.8;
+            ctx.shadowColor = '#00E5FF';
+            ctx.shadowBlur = 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // reset
+        }
+
+        // CSV Historian Downloader
+        document.getElementById('btnExportLog').addEventListener('click', () => {
+            if (state.history.length === 0) return;
+            let csv = "Index,Setpoint,ProcessValue,ActuatorMV\n";
+            state.history.forEach((row, i) => {
+                csv += `${i},${row.sp.toFixed(2)},${row.pv.toFixed(2)},${row.mv.toFixed(2)}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `apex_telemetry_snapshot_${Date.now()}.csv`;
+            a.click();
+            playIndustrialBeep(750, 'triangle', 0.1);
+        });
+
+        // Alarm Acknowledge Button
+        document.getElementById('btnAck').addEventListener('click', () => {
+            playIndustrialBeep(920, 'sine', 0.05);
+            appendHexTerminal('[ACK] Operator acknowledged active alarm state.');
+        });
+
+        // Start 60FPS Engine
+        requestAnimationFrame(engineLoop);
+    </script>
+</body>
+</html>
