@@ -873,9 +873,36 @@
                     <span>SENSOR GAUSSIAN NOISE</span>
                     <input type="checkbox" id="checkNoise" style="cursor: pointer;">
                 </div>
+<!-- Field Fault Injection & Safety Diagnostics -->
+            <div class="card-panel red-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="alert-triangle" style="width: 14px; height: 14px;"></i> FIELD FAULT INJECTION</span>
+                    <span id="faultStatusLed" class="mono" style="font-size: 0.65rem; color: var(--emerald-online);">SYSTEM NOMINAL</span>
+                </div>
+                <div class="disturbance-grid">
+                    <button class="disturb-btn mono" id="btnSensorDropout">SENSOR DROPOUT</button>
+                    <button class="disturb-btn mono" id="btnValveJam">VALVE MECHANICAL JAM</button>
+                    <button class="disturb-btn mono" id="btnProcessSurge">PROCESS SURGE</button>
+                </div>
+</div>
+
+            <!-- Field Fault Injection & Safety Diagnostics -->
+            <div class="card-panel red-accent">
+                <div class="panel-header">
+                    <span class="panel-title mono"><i data-lucide="alert-triangle" style="width: 14px; height: 14px;"></i> FIELD FAULT INJECTION</span>
+                    <span id="faultStatusLed" class="mono" style="font-size: 0.65rem; color: var(--emerald-online);">SYSTEM NOMINAL</span>
+                </div>
+                <div class="disturbance-grid">
+                    <button class="disturb-btn mono" id="btnSensorDropout">SENSOR DROPOUT</button>
+                    <button class="disturb-btn mono" id="btnValveJam">VALVE MECHANICAL JAM</button>
+                </div>
+                <div class="toggle-row mono">
+                    <span>PROCESS SURGE</span>
+                    <button class="disturb-btn mono" id="btnProcessSurge">PROCESS SURGE</button>
+                </div>
             </div>
 
-        </aside>
+</aside>
 
         <!-- Center Supervisory Cockpit Area -->
         <main class="cockpit-view">
@@ -1144,7 +1171,7 @@
         updateClock();
 
         // SCADA Simulation State
-        const state = {
+const state = {
             isRunning: true,
             isEstop: false,
             mode: 'sim', // 'sim' | 'hil'
@@ -1159,6 +1186,9 @@
             tau: 2.5,
             disturbance: 0.0,
             noise: false,
+            sensorDropout: false,
+            valveJam: false,
+            jammedMvVal: 0,
             history: [],
             waveOffset: 0
         };
@@ -1231,6 +1261,68 @@
             state.disturbance -= 25.0;
             playIndustrialBeep(280, 'sawtooth', 0.15);
         });
+
+        // Field Fault Injection Handlers
+        const btnSensorDropout = document.getElementById('btnSensorDropout');
+        const btnValveJam = document.getElementById('btnValveJam');
+        const btnProcessSurge = document.getElementById('btnProcessSurge');
+
+        function toggleFaultButton(btn, faultKey, faultName) {
+            btn.classList.toggle('active', !btn.classList.contains('active'));
+            const isActive = !btn.classList.contains('active');
+            btn.style.color = isActive ? 'var(--red-estop)' : '';
+            btn.style.boxShadow = isActive ? '0 0 12px var(--red-estop)' : '';
+            return isActive;
+        }
+
+        btnSensorDropout.addEventListener('click', () => {
+            const active = toggleFaultButton(btnSensorDropout, 'sensorDropout', '4-20mA');
+            state.sensorDropout = active;
+            if (active) {
+                playIndustrialBeep(400, 'sine', 0.1);
+                appendHexTerminal('[DIAG_FAULT] 4-20mA Transmitter open-circuit fault injected.');
+            } else {
+                playIndustrialBeep(500, 'sine', 0.08);
+                appendHexTerminal('[DIAG_RECOVER] 4-20mA Transmitter fault cleared.');
+            }
+            updateFaultStatusLed();
+        });
+
+        btnValveJam.addEventListener('click', () => {
+            const active = toggleFaultButton(btnValveJam, 'valveJam', 'Valve Mechanical');
+            state.valveJam = active;
+            if (active) {
+                state.jammedMvVal = state.mv;
+                playIndustrialBeep(450, 'square', 0.15);
+                appendHexTerminal('[DIAG_FAULT] Valve mechanical jam injected - MV frozen at ' + state.jammedMvVal.toFixed(1) + '%.');
+            } else {
+                playIndustrialBeep(500, 'sine', 0.08);
+                appendHexTerminal('[DIAG_RECOVER] Valve mechanical jam cleared.');
+            }
+            updateFaultStatusLed();
+        });
+
+        btnProcessSurge.addEventListener('click', () => {
+            state.disturbance += 40.0;
+            playIndustrialBeep(350, 'sawtooth', 0.12);
+            appendHexTerminal('[DIAG_FAULT] Process surge +40% slug injected.');
+            updateFaultStatusLed();
+        });
+
+        function updateFaultStatusLed() {
+            const led = document.getElementById('faultStatusLed');
+            const isAnyFault = state.sensorDropout || state.valveJam || state.disturbance > 0;
+            if (state.sensorDropout || state.valveJam || state.disturbance > 0) {
+                led.textContent = 'FAULT ACTIVE';
+                led.style.color = 'var(--red-estop)';
+            } else {
+                led.textContent = 'SYSTEM NOMINAL';
+                led.style.color = 'var(--emerald-online)';
+            }
+        }
+
+        // Initialize status led
+        updateFaultStatusLed();
 
         // E-STOP Logic
         const btnEstop = document.getElementById('btnEstop');
@@ -1355,7 +1447,7 @@
 
             if (!state.isEstop) {
                 // PID Calculation (تتم محلياً إذا لم يكن هناك وسيط هاردوير نشط)
-                if (!isRealtimeHardwareActive) {
+                if (!isRealtimeHardwareActive && !state.valveJam) {
                     const error = state.sp - state.pv;
                     state.integral += error * dt;
                     state.integral = Math.max(-40, Math.min(40, state.integral));
@@ -1374,8 +1466,13 @@
                 state.pv += (0.0 - state.pv) / 4.0 * dt;
             }
 
+            // Field Fault Injection Handling
             let renderedPv = state.pv;
-            if (state.noise) {
+            if (state.sensorDropout) {
+                renderedPv = 0.0;
+            } else if (!state.noise) {
+                renderedPv = state.pv;
+            } else {
                 renderedPv += (Math.random() - 0.5) * 0.8;
             }
             renderedPv = Math.max(0.0, Math.min(100.0, renderedPv));
