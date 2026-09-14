@@ -21,12 +21,13 @@
         }
 
         :root {
-            --bg-base: #030508;
-            --bg-surface: #070B12;
-            --bg-card: #0A0F1A;
+            --bg-base: #020408;
+            --bg-surface: rgba(7, 11, 18, 0.75);
+            --bg-card: rgba(10, 15, 26, 0.72);
+            --bg-card-hover: rgba(15, 22, 38, 0.85);
             --bg-elevated: #0F1626;
-            --border-dim: #131E33;
-            --border-active: #1D2D4D;
+            --border-dim: rgba(29, 45, 77, 0.45);
+            --border-active: rgba(0, 229, 255, 0.35);
             --cyan-primary: #00E5FF;
             --cyan-glow: rgba(0, 229, 255, 0.4);
             --orange-alert: #FF3D00;
@@ -57,10 +58,11 @@
             display: flex;
             flex-direction: column;
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.04) 0%, transparent 60%),
-                linear-gradient(rgba(19, 30, 51, 0.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(19, 30, 51, 0.3) 1px, transparent 1px);
-            background-size: 100% 100%, 32px 32px, 32px 32px;
+                radial-gradient(circle at 50% -10%, rgba(0, 229, 255, 0.08) 0%, transparent 55%),
+                radial-gradient(circle at 100% 100%, rgba(0, 82, 204, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(19, 30, 51, 0.25) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(19, 30, 51, 0.25) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
         }
 
         /* Subtle Scanline Overlay */
@@ -68,11 +70,11 @@
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
             background-size: 100% 4px;
             pointer-events: none;
             z-index: 999;
-            opacity: 0.4;
+            opacity: 0.35;
         }
 
         .mono {
@@ -84,25 +86,28 @@
             width: 6px;
         }
         aside.tactical-sidebar::-webkit-scrollbar-track {
-            background: #04070D;
+            background: rgba(4, 7, 13, 0.8);
             border-left: 1px solid var(--border-dim);
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb {
             background: #19263E;
             border-radius: 3px;
+            transition: background 0.2s, box-shadow 0.2s;
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb:hover {
             background: var(--cyan-primary);
-            box-shadow: 0 0 8px var(--cyan-glow);
+            box-shadow: 0 0 10px var(--cyan-glow);
         }
 
         /* Header Cockpit */
         header.cockpit-bar {
             height: 54px;
             min-height: 54px;
-            background: rgba(7, 11, 18, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-dim);
+            background: rgba(5, 8, 14, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -125,7 +130,7 @@
             align-items: center;
             justify-content: center;
             color: #000;
-            box-shadow: 0 0 12px var(--cyan-glow);
+            box-shadow: 0 0 16px var(--cyan-glow);
         }
 
         .brand-title {
@@ -133,15 +138,17 @@
             font-weight: 800;
             letter-spacing: 1.5px;
             color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .brand-version {
             font-size: 0.65rem;
             color: var(--cyan-primary);
-            background: rgba(0, 229, 255, 0.1);
+            background: rgba(0, 229, 255, 0.08);
             padding: 2px 6px;
             border-radius: 4px;
             border: 1px solid rgba(0, 229, 255, 0.25);
+            box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.15);
         }
 
         .header-metrics {
@@ -155,12 +162,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 5px 12px;
+            border-radius: 6px;
             background: rgba(0, 230, 118, 0.08);
             border: 1px solid rgba(0, 230, 118, 0.3);
             color: var(--emerald-online);
             font-weight: 600;
+            box-shadow: 0 0 12px rgba(0, 230, 118, 0.15);
         }
 
         .pulse-dot {
@@ -183,21 +191,26 @@
         }
 
         .audio-toggle-btn {
-            background: transparent;
-            border: 1px solid var(--border-active);
+            background: rgba(15, 22, 38, 0.5);
+            border: 1px solid var(--border-dim);
             color: var(--text-muted);
             padding: 6px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .audio-toggle-btn:hover {
+            border-color: var(--cyan-primary);
+            color: #FFF;
+        }
         .audio-toggle-btn.active {
             color: var(--cyan-primary);
             border-color: var(--cyan-primary);
-            box-shadow: 0 0 8px var(--cyan-glow);
+            box-shadow: 0 0 12px var(--cyan-glow);
+            background: rgba(0, 229, 255, 0.1);
         }
 
         /* Workspace Grid Container */
@@ -216,9 +229,11 @@
             }
         }
 
-        /* Sidebar Control Center - Fully Scrollable */
+        /* Sidebar Control Center - Glassmorphism */
         aside.tactical-sidebar {
             background: var(--bg-surface);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border-right: 1px solid var(--border-dim);
             padding: 16px;
             height: 100%;
@@ -232,15 +247,26 @@
             scrollbar-gutter: stable;
         }
 
+        /* Cyberpunk Glass Panel Design */
         .card-panel {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
-            padding: 14px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-panel:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(0, 229, 255, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .card-panel::before {
@@ -248,11 +274,23 @@
             position: absolute;
             top: 0; left: 0; width: 3px; height: 100%;
             background: var(--border-active);
+            transition: width 0.2s ease, box-shadow 0.2s ease;
         }
+        .card-panel:hover::before {
+            width: 4px;
+        }
+
         .card-panel.cyan-accent::before { background: var(--cyan-primary); }
+        .card-panel.cyan-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.15); }
+
         .card-panel.orange-accent::before { background: var(--orange-alert); }
+        .card-panel.orange-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 61, 0, 0.15); }
+
         .card-panel.emerald-accent::before { background: var(--emerald-online); }
+        .card-panel.emerald-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 230, 118, 0.15); }
+
         .card-panel.red-accent::before { background: var(--red-estop); }
+        .card-panel.red-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(255, 23, 68, 0.2); }
 
         .panel-header {
             display: flex;
@@ -286,13 +324,13 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 24px rgba(255, 23, 68, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.2);
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .estop-button:hover {
             background: linear-gradient(180deg, #B91C1C 0%, #7F1D1D 100%);
-            box-shadow: 0 0 30px rgba(255, 23, 68, 0.7), inset 0 2px 6px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 35px rgba(255, 23, 68, 0.75), inset 0 2px 6px rgba(255, 255, 255, 0.3);
             transform: translateY(-1px);
         }
 
@@ -312,7 +350,7 @@
             margin-top: 8px;
             width: 100%;
             padding: 8px;
-            background: #0B1424;
+            background: rgba(11, 20, 36, 0.85);
             border: 1px solid var(--border-active);
             color: var(--cyan-primary);
             border-radius: 6px;
@@ -330,6 +368,7 @@
         .reset-estop-btn:hover {
             background: rgba(0, 229, 255, 0.15);
             border-color: var(--cyan-primary);
+            box-shadow: 0 0 12px var(--cyan-glow);
         }
 
         /* Preset & Mode Switcher */
@@ -337,7 +376,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 4px;
-            background: var(--bg-surface);
+            background: rgba(4, 7, 13, 0.6);
             padding: 3px;
             border-radius: 6px;
             border: 1px solid var(--border-dim);
@@ -358,24 +397,26 @@
         }
 
         .segment-btn.active {
-            background: var(--border-active);
+            background: rgba(29, 45, 77, 0.8);
             color: #FFF;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 229, 255, 0.3);
         }
 
         .select-input {
             width: 100%;
-            background: var(--bg-surface);
+            background: rgba(4, 7, 13, 0.7);
             border: 1px solid var(--border-dim);
             color: #FFF;
             padding: 8px 10px;
             border-radius: 6px;
             font-size: 0.8rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         .select-input:focus {
             border-color: var(--cyan-primary);
+            box-shadow: 0 0 10px var(--cyan-glow);
         }
 
         /* Dynamic Setpoint Slider & Inputs */
@@ -388,7 +429,7 @@
             -webkit-appearance: none;
             appearance: none;
             height: 6px;
-            background: #141D2D;
+            background: rgba(20, 29, 45, 0.7);
             border-radius: 3px;
             outline: none;
         }
@@ -400,7 +441,7 @@
             background: var(--amber-sp);
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 0 10px var(--amber-glow);
+            box-shadow: 0 0 12px var(--amber-glow);
             transition: transform 0.1s;
         }
         .range-slider::-webkit-slider-thumb:hover {
@@ -420,14 +461,15 @@
             color: var(--amber-sp);
             font-size: 0.7rem;
             font-weight: 600;
-            padding: 4px;
-            border-radius: 4px;
+            padding: 5px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
         .chip-btn:hover {
             background: rgba(255, 215, 0, 0.2);
             border-color: var(--amber-sp);
+            box-shadow: 0 0 10px var(--amber-glow);
         }
 
         /* PID Tuning Grid */
@@ -438,10 +480,15 @@
         }
 
         .pid-cell {
-            background: var(--bg-surface);
+            background: rgba(4, 7, 13, 0.6);
             border: 1px solid var(--border-dim);
             border-radius: 6px;
             padding: 8px;
+            transition: border-color 0.2s;
+        }
+        .pid-cell:focus-within {
+            border-color: var(--cyan-primary);
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
         }
 
         .pid-cell label {
@@ -476,7 +523,7 @@
         }
 
         .disturb-btn {
-            background: #141B29;
+            background: rgba(20, 27, 41, 0.7);
             border: 1px solid var(--border-active);
             color: var(--orange-alert);
             font-size: 0.72rem;
@@ -491,14 +538,14 @@
             gap: 4px;
         }
         .disturb-btn:hover {
-            background: rgba(255, 61, 0, 0.15);
+            background: rgba(255, 61, 0, 0.18);
             border-color: var(--orange-alert);
-            box-shadow: 0 0 10px var(--orange-glow);
+            box-shadow: 0 0 12px var(--orange-glow);
         }
 
         .fault-btn {
-            background: #160B0E;
-            border: 1px solid rgba(255, 23, 68, 0.3);
+            background: rgba(22, 11, 14, 0.75);
+            border: 1px solid rgba(255, 23, 68, 0.35);
             color: #FF5252;
             font-size: 0.72rem;
             font-weight: 700;
@@ -512,15 +559,15 @@
             gap: 6px;
         }
         .fault-btn:hover {
-            background: rgba(255, 23, 68, 0.18);
+            background: rgba(255, 23, 68, 0.2);
             border-color: var(--red-estop);
-            box-shadow: 0 0 12px rgba(255, 23, 68, 0.4);
+            box-shadow: 0 0 14px rgba(255, 23, 68, 0.45);
         }
         .fault-btn.active {
             background: #3B0711;
             border-color: var(--red-estop);
             color: #FFF;
-            box-shadow: 0 0 14px var(--red-estop);
+            box-shadow: 0 0 18px var(--red-estop);
         }
 
         .toggle-row {
@@ -545,12 +592,15 @@
         /* ISA 18.2 Alarm Ribbon */
         .alarm-annunciator {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
-            padding: 8px 14px;
+            border-radius: 10px;
+            padding: 9px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
         .alarm-matrix {
@@ -560,29 +610,29 @@
 
         .alarm-box {
             padding: 5px 12px;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 0.68rem;
             font-weight: 800;
             letter-spacing: 1px;
-            background: #0B101A;
+            background: rgba(11, 16, 26, 0.85);
             border: 1px solid #19253B;
             color: #475569;
             transition: all 0.25s;
         }
 
         .alarm-box.active-critical {
-            background: rgba(255, 23, 68, 0.2);
+            background: rgba(255, 23, 68, 0.25);
             border-color: var(--red-estop);
             color: #FF5252;
-            box-shadow: 0 0 12px rgba(255, 23, 68, 0.5);
+            box-shadow: 0 0 16px rgba(255, 23, 68, 0.6);
             animation: alarm-flash 0.8s infinite alternate;
         }
 
         .alarm-box.active-warning {
-            background: rgba(255, 215, 0, 0.15);
+            background: rgba(255, 215, 0, 0.2);
             border-color: var(--amber-sp);
             color: var(--amber-sp);
-            box-shadow: 0 0 10px var(--amber-glow);
+            box-shadow: 0 0 14px var(--amber-glow);
         }
 
         @keyframes alarm-flash {
@@ -591,11 +641,11 @@
         }
 
         .ack-btn {
-            background: #131E33;
+            background: rgba(19, 30, 51, 0.8);
             border: 1px solid var(--border-active);
             color: #FFF;
-            padding: 4px 12px;
-            border-radius: 4px;
+            padding: 5px 14px;
+            border-radius: 5px;
             font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
@@ -604,6 +654,7 @@
         .ack-btn:hover {
             background: var(--border-active);
             border-color: var(--cyan-primary);
+            box-shadow: 0 0 10px var(--cyan-glow);
         }
 
         /* Twin & Gauges Dual Panel */
@@ -619,11 +670,13 @@
             }
         }
 
-        /* SVG Synoptic Twin */
+        /* SVG Synoptic Twin Card */
         .synoptic-card {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px;
             position: relative;
             display: flex;
@@ -638,11 +691,13 @@
             justify-content: center;
         }
 
-        /* Gauges Cluster */
+        /* Gauges Cluster Card */
         .gauges-card {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px;
             display: flex;
             flex-direction: column;
@@ -683,11 +738,13 @@
             letter-spacing: 1px;
         }
 
-        /* Oscilloscope Plot */
+        /* Oscilloscope Plot Card */
         .oscilloscope-card {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px;
             display: flex;
             flex-direction: column;
@@ -703,8 +760,9 @@
             width: 100%;
             height: 100%;
             display: block;
-            border-radius: 4px;
-            background: #05080E;
+            border-radius: 6px;
+            background: #03060B;
+            border: 1px solid rgba(19, 30, 51, 0.4);
         }
 
         /* Bottom Gateway & Hex Matrix */
@@ -723,8 +781,10 @@
 
         .gateway-card {
             background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 12px;
         }
 
@@ -745,12 +805,12 @@
 
         table.modbus-table td {
             padding: 6px 8px;
-            border-bottom: 1px solid rgba(19, 30, 51, 0.5);
+            border-bottom: 1px solid rgba(19, 30, 51, 0.4);
             font-family: 'JetBrains Mono', monospace;
         }
 
         .terminal-box {
-            background: #030509;
+            background: rgba(3, 5, 9, 0.85);
             border: 1px solid var(--border-dim);
             border-radius: 6px;
             padding: 8px 10px;
@@ -771,11 +831,11 @@
         .hex-line.sys { color: var(--text-muted); }
 
         .btn-export {
-            background: #0E1626;
+            background: rgba(14, 22, 38, 0.8);
             border: 1px solid var(--border-active);
             color: #FFF;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 5px 12px;
+            border-radius: 5px;
             font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
@@ -787,6 +847,7 @@
         .btn-export:hover {
             border-color: var(--emerald-online);
             color: var(--emerald-online);
+            box-shadow: 0 0 10px var(--emerald-glow);
         }
     </style>
 </head>
@@ -822,7 +883,7 @@
     <!-- Main Workspace Grid -->
     <div class="workspace-grid">
         
-        <!-- Left Tactical Control Sidebar (Fully Scrollable) -->
+        <!-- Left Tactical Control Sidebar -->
         <aside class="tactical-sidebar">
             
             <!-- E-STOP Module -->
@@ -1022,16 +1083,16 @@
                             <text x="380" y="88" text-anchor="middle" fill="#64748B" font-family="JetBrains Mono" font-size="8">OUTFLOW</text>
 
                             <!-- Digital Telemetry Badges in Synoptic -->
-                            <rect x="460" y="40" width="190" height="60" rx="6" fill="#070C15" stroke="#00E5FF" stroke-width="1"/>
+                            <rect x="460" y="40" width="190" height="60" rx="6" fill="rgba(7, 12, 21, 0.85)" stroke="#00E5FF" stroke-width="1"/>
                             <text x="475" y="58" fill="#64748B" font-family="JetBrains Mono" font-size="8" letter-spacing="1">PROCESS LEVEL (PV)</text>
                             <text id="synopticPvText" x="475" y="88" fill="#00E5FF" font-family="JetBrains Mono" font-size="28" font-weight="800" filter="url(#glowCyan)">65.00</text>
                             <text x="590" y="88" fill="#00E5FF" font-family="JetBrains Mono" font-size="14">%</text>
 
-                            <rect x="460" y="112" width="190" height="42" rx="6" fill="#070C15" stroke="#1D2E4D" stroke-width="1"/>
+                            <rect x="460" y="112" width="190" height="42" rx="6" fill="rgba(7, 12, 21, 0.85)" stroke="#1D2E4D" stroke-width="1"/>
                             <circle id="beaconLed" cx="480" cy="133" r="5" fill="#00E676"/>
                             <text id="beaconText" x="495" y="137" fill="#00E676" font-family="JetBrains Mono" font-size="11" font-weight="700">OPERATIONAL</text>
 
-                            <rect x="460" y="162" width="190" height="34" rx="6" fill="#070C15" stroke="#1D2E4D" stroke-width="1"/>
+                            <rect x="460" y="162" width="190" height="34" rx="6" fill="rgba(7, 12, 21, 0.85)" stroke="#1D2E4D" stroke-width="1"/>
                             <text x="475" y="183" fill="#64748B" font-family="JetBrains Mono" font-size="9">ERR (SP-PV)</text>
                             <text id="synopticErrText" x="635" y="183" text-anchor="end" fill="#00E676" font-family="JetBrains Mono" font-size="12" font-weight="700">+0.00%</text>
                         </svg>
@@ -1599,7 +1660,7 @@
             ctx.clearRect(0, 0, w, h);
 
             ctx.lineWidth = 1;
-            ctx.strokeStyle = '#0F1827';
+            ctx.strokeStyle = 'rgba(15, 24, 39, 0.8)';
             for (let x = 0; x < w; x += 40) {
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
@@ -1660,7 +1721,7 @@
             ctx.strokeStyle = '#00E5FF';
             ctx.lineWidth = 2.8;
             ctx.shadowColor = '#00E5FF';
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 10;
             ctx.stroke();
             ctx.shadowBlur = 0;
         }
