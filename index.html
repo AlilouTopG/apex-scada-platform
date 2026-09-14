@@ -88,6 +88,24 @@
             background: var(--cyan-primary);
         }
 
+        /* Tactical Sidebar Custom Scrollbar */
+        aside.tactical-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        aside.tactical-sidebar::-webkit-scrollbar-track {
+            background: #04070D;
+            border-left: 1px solid var(--border-dim);
+        }
+        aside.tactical-sidebar::-webkit-scrollbar-thumb {
+            background: #19263E;
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+        aside.tactical-sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan-primary);
+            box-shadow: 0 0 8px var(--cyan-glow);
+        }
+
         /* Header Cockpit */
         header.cockpit-bar {
             height: 54px;
@@ -197,6 +215,7 @@
             grid-template-columns: 360px 1fr;
             flex: 1;
             height: calc(100vh - 54px);
+            min-height: 0;
             overflow: hidden;
         }
 
@@ -212,6 +231,10 @@
             border-right: 1px solid var(--border-dim);
             padding: 16px;
             overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+            scroll-behavior: smooth;
+            padding-bottom: 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
