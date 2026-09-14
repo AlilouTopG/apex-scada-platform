@@ -90,20 +90,17 @@
 
         /* Tactical Sidebar Custom Scrollbar */
         aside.tactical-sidebar::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         aside.tactical-sidebar::-webkit-scrollbar-track {
-            background: #04070D;
-            border-left: 1px solid var(--border-dim);
+            background: #070B12;
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb {
-            background: #19263E;
-            border-radius: 3px;
-            transition: background 0.2s ease;
+            background: #1D2D4D;
+            border-radius: 4px;
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb:hover {
             background: var(--cyan-primary);
-            box-shadow: 0 0 8px var(--cyan-glow);
         }
 
         /* Header Cockpit */
@@ -215,6 +212,7 @@
             grid-template-columns: 360px 1fr;
             flex: 1;
             height: calc(100vh - 54px);
+            max-height: calc(100vh - 54px);
             min-height: 0;
             overflow: hidden;
         }
@@ -230,14 +228,14 @@
             background: var(--bg-surface);
             border-right: 1px solid var(--border-dim);
             padding: 16px;
-            overflow-y: auto;
+            height: 100%;
+            max-height: 100%;
+            overflow-y: scroll !important;
             overflow-x: hidden;
-            scrollbar-gutter: stable;
-            scroll-behavior: smooth;
-            padding-bottom: 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            box-sizing: border-box;
         }
 
         .card-panel {
