@@ -40,6 +40,19 @@
             --text-primary: #E2E8F0;
             --text-muted: #64748B;
             --text-dim: #334155;
+            --grid-line: rgba(19, 30, 51, 0.25);
+        }
+
+        /* Tactical Slate / Control Room Theme */
+        body.theme-slate {
+            --bg-base: #0d131a;
+            --bg-surface: rgba(20, 29, 40, 0.85);
+            --bg-card: rgba(26, 38, 54, 0.8);
+            --bg-card-hover: rgba(35, 50, 70, 0.9);
+            --border-dim: rgba(70, 95, 125, 0.5);
+            --border-active: rgba(0, 229, 255, 0.6);
+            --grid-line: rgba(55, 75, 100, 0.3);
+            --text-primary: #F1F5F9;
         }
 
         * {
@@ -60,12 +73,12 @@
             background-image: 
                 radial-gradient(circle at 50% -10%, rgba(0, 229, 255, 0.08) 0%, transparent 55%),
                 radial-gradient(circle at 100% 100%, rgba(0, 82, 204, 0.05) 0%, transparent 40%),
-                linear-gradient(rgba(19, 30, 51, 0.25) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(19, 30, 51, 0.25) 1px, transparent 1px);
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
             background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+            transition: background-color 0.3s ease;
         }
 
-        /* Subtle Scanline Overlay */
         body::after {
             content: "";
             position: fixed;
@@ -77,29 +90,13 @@
             opacity: 0.35;
         }
 
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Tactical Sidebar Scrollbar */
-        aside.tactical-sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-        aside.tactical-sidebar::-webkit-scrollbar-track {
-            background: rgba(4, 7, 13, 0.8);
-            border-left: 1px solid var(--border-dim);
-        }
-        aside.tactical-sidebar::-webkit-scrollbar-thumb {
-            background: #19263E;
-            border-radius: 3px;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-        aside.tactical-sidebar::-webkit-scrollbar-thumb:hover {
-            background: var(--cyan-primary);
-            box-shadow: 0 0 10px var(--cyan-glow);
-        }
+        aside.tactical-sidebar::-webkit-scrollbar { width: 6px; }
+        aside.tactical-sidebar::-webkit-scrollbar-track { background: rgba(4, 7, 13, 0.8); border-left: 1px solid var(--border-dim); }
+        aside.tactical-sidebar::-webkit-scrollbar-thumb { background: #19263E; border-radius: 3px; }
+        aside.tactical-sidebar::-webkit-scrollbar-thumb:hover { background: var(--cyan-primary); box-shadow: 0 0 10px var(--cyan-glow); }
 
-        /* Header Cockpit */
         header.cockpit-bar {
             height: 54px;
             min-height: 54px;
@@ -115,12 +112,7 @@
             z-index: 100;
         }
 
-        .brand-cluster {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .brand-cluster { display: flex; align-items: center; gap: 12px; }
         .brand-icon {
             width: 32px;
             height: 32px;
@@ -132,15 +124,7 @@
             color: #000;
             box-shadow: 0 0 16px var(--cyan-glow);
         }
-
-        .brand-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
+        .brand-title { font-size: 1.05rem; font-weight: 800; letter-spacing: 1.5px; color: #fff; }
         .brand-version {
             font-size: 0.65rem;
             color: var(--cyan-primary);
@@ -148,16 +132,9 @@
             padding: 2px 6px;
             border-radius: 4px;
             border: 1px solid rgba(0, 229, 255, 0.25);
-            box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.15);
         }
 
-        .header-metrics {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 0.8rem;
-        }
-
+        .header-metrics { display: flex; align-items: center; gap: 16px; font-size: 0.8rem; }
         .telemetry-badge {
             display: flex;
             align-items: center;
@@ -168,9 +145,7 @@
             border: 1px solid rgba(0, 230, 118, 0.3);
             color: var(--emerald-online);
             font-weight: 600;
-            box-shadow: 0 0 12px rgba(0, 230, 118, 0.15);
         }
-
         .pulse-dot {
             width: 8px;
             height: 8px;
@@ -179,19 +154,17 @@
             box-shadow: 0 0 8px var(--emerald-online);
             animation: pulse-glow 1.2s infinite alternate;
         }
-
         .pulse-dot.danger {
             background: var(--red-estop) !important;
             box-shadow: 0 0 12px var(--red-estop) !important;
         }
-
         @keyframes pulse-glow {
             from { opacity: 0.4; transform: scale(0.85); }
             to { opacity: 1; transform: scale(1.15); }
         }
 
-        .audio-toggle-btn {
-            background: rgba(15, 22, 38, 0.5);
+        .action-icon-btn {
+            background: rgba(15, 22, 38, 0.6);
             border: 1px solid var(--border-dim);
             color: var(--text-muted);
             padding: 6px;
@@ -202,18 +175,14 @@
             align-items: center;
             justify-content: center;
         }
-        .audio-toggle-btn:hover {
-            border-color: var(--cyan-primary);
-            color: #FFF;
-        }
-        .audio-toggle-btn.active {
+        .action-icon-btn:hover { border-color: var(--cyan-primary); color: #FFF; }
+        .action-icon-btn.active {
             color: var(--cyan-primary);
             border-color: var(--cyan-primary);
             box-shadow: 0 0 12px var(--cyan-glow);
             background: rgba(0, 229, 255, 0.1);
         }
 
-        /* Workspace Grid Container */
         .workspace-grid {
             display: grid;
             grid-template-columns: 360px 1fr;
@@ -223,13 +192,6 @@
             position: relative;
         }
 
-        @media (max-width: 1200px) {
-            .workspace-grid {
-                grid-template-columns: 320px 1fr;
-            }
-        }
-
-        /* Sidebar Control Center - Glassmorphism */
         aside.tactical-sidebar {
             background: var(--bg-surface);
             backdrop-filter: blur(25px);
@@ -247,69 +209,38 @@
             scrollbar-gutter: stable;
         }
 
-        /* Cyberpunk Glass Panel Design */
         .card-panel {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
             border-radius: 10px;
-            padding: 15px;
+            padding: 14px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
         .card-panel:hover {
             background: var(--bg-card-hover);
             border-color: rgba(0, 229, 255, 0.25);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.08);
             transform: translateY(-2px);
         }
-
         .card-panel::before {
             content: "";
             position: absolute;
             top: 0; left: 0; width: 3px; height: 100%;
             background: var(--border-active);
-            transition: width 0.2s ease, box-shadow 0.2s ease;
         }
-        .card-panel:hover::before {
-            width: 4px;
-        }
-
         .card-panel.cyan-accent::before { background: var(--cyan-primary); }
-        .card-panel.cyan-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.15); }
-
         .card-panel.orange-accent::before { background: var(--orange-alert); }
-        .card-panel.orange-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 61, 0, 0.15); }
-
         .card-panel.emerald-accent::before { background: var(--emerald-online); }
-        .card-panel.emerald-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 230, 118, 0.15); }
-
         .card-panel.red-accent::before { background: var(--red-estop); }
-        .card-panel.red-accent:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(255, 23, 68, 0.2); }
 
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .panel-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1.2px; display: flex; align-items: center; gap: 6px; }
 
-        .panel-title {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: 1.2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* Heavy Industrial E-STOP Button */
         .estop-button {
             width: 100%;
             height: 52px;
@@ -327,24 +258,8 @@
             box-shadow: 0 0 24px rgba(255, 23, 68, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.2);
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .estop-button:hover {
-            background: linear-gradient(180deg, #B91C1C 0%, #7F1D1D 100%);
-            box-shadow: 0 0 35px rgba(255, 23, 68, 0.75), inset 0 2px 6px rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .estop-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 0 10px rgba(255, 23, 68, 0.3);
-        }
-
-        .estop-button.latched {
-            background: #1A0507;
-            border-color: #550D15;
-            color: #7F1D1D;
-            box-shadow: none;
-        }
+        .estop-button:hover { background: linear-gradient(180deg, #B91C1C 0%, #7F1D1D 100%); box-shadow: 0 0 35px rgba(255, 23, 68, 0.75); transform: translateY(-1px); }
+        .estop-button.latched { background: #1A0507; border-color: #550D15; color: #7F1D1D; box-shadow: none; }
 
         .reset-estop-btn {
             margin-top: 8px;
@@ -356,22 +271,10 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             display: none;
         }
-        .reset-estop-btn.visible {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .reset-estop-btn:hover {
-            background: rgba(0, 229, 255, 0.15);
-            border-color: var(--cyan-primary);
-            box-shadow: 0 0 12px var(--cyan-glow);
-        }
+        .reset-estop-btn.visible { display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* Preset & Mode Switcher */
         .segmented-selector {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -382,7 +285,6 @@
             border: 1px solid var(--border-dim);
             margin-bottom: 10px;
         }
-
         .segment-btn {
             background: transparent;
             border: none;
@@ -392,16 +294,9 @@
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
             text-align: center;
         }
-
-        .segment-btn.active {
-            background: rgba(29, 45, 77, 0.8);
-            color: #FFF;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-        }
+        .segment-btn.active { background: rgba(29, 45, 77, 0.8); color: #FFF; border: 1px solid rgba(0, 229, 255, 0.3); }
 
         .select-input {
             width: 100%;
@@ -412,22 +307,10 @@
             border-radius: 6px;
             font-size: 0.8rem;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .select-input:focus {
-            border-color: var(--cyan-primary);
-            box-shadow: 0 0 10px var(--cyan-glow);
-        }
-
-        /* Dynamic Setpoint Slider & Inputs */
-        .slider-wrapper {
-            margin: 12px 0 6px 0;
-        }
-
         .range-slider {
             width: 100%;
             -webkit-appearance: none;
-            appearance: none;
             height: 6px;
             background: rgba(20, 29, 45, 0.7);
             border-radius: 3px;
@@ -435,25 +318,15 @@
         }
         .range-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 18px;
             height: 18px;
             background: var(--amber-sp);
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 12px var(--amber-glow);
-            transition: transform 0.1s;
-        }
-        .range-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
-        .quick-chips {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
+        .quick-chips { display: flex; gap: 6px; margin-top: 8px; }
         .chip-btn {
             flex: 1;
             background: rgba(255, 215, 0, 0.05);
@@ -464,64 +337,14 @@
             padding: 5px;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-        .chip-btn:hover {
-            background: rgba(255, 215, 0, 0.2);
-            border-color: var(--amber-sp);
-            box-shadow: 0 0 10px var(--amber-glow);
         }
 
-        /* PID Tuning Grid */
-        .pid-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
+        .pid-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .pid-cell { background: rgba(4, 7, 13, 0.6); border: 1px solid var(--border-dim); border-radius: 6px; padding: 8px; }
+        .pid-cell label { display: block; font-size: 0.68rem; color: var(--text-muted); margin-bottom: 4px; }
+        .pid-cell input { width: 100%; background: transparent; border: none; color: #FFF; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; outline: none; }
 
-        .pid-cell {
-            background: rgba(4, 7, 13, 0.6);
-            border: 1px solid var(--border-dim);
-            border-radius: 6px;
-            padding: 8px;
-            transition: border-color 0.2s;
-        }
-        .pid-cell:focus-within {
-            border-color: var(--cyan-primary);
-            box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
-        }
-
-        .pid-cell label {
-            display: block;
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .pid-cell input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #FFF;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            font-weight: 700;
-            outline: none;
-        }
-
-        /* Disturbance & Faults Layout */
-        .disturbance-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .faults-column-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        .disturbance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .disturb-btn {
             background: rgba(20, 27, 41, 0.7);
             border: 1px solid var(--border-active);
@@ -531,18 +354,12 @@
             padding: 8px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
         }
-        .disturb-btn:hover {
-            background: rgba(255, 61, 0, 0.18);
-            border-color: var(--orange-alert);
-            box-shadow: 0 0 12px var(--orange-glow);
-        }
-
+        .faults-column-grid { display: flex; flex-direction: column; gap: 8px; }
         .fault-btn {
             background: rgba(22, 11, 14, 0.75);
             border: 1px solid rgba(255, 23, 68, 0.35);
@@ -552,62 +369,26 @@
             padding: 9px 10px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
         }
-        .fault-btn:hover {
-            background: rgba(255, 23, 68, 0.2);
-            border-color: var(--red-estop);
-            box-shadow: 0 0 14px rgba(255, 23, 68, 0.45);
-        }
-        .fault-btn.active {
-            background: #3B0711;
-            border-color: var(--red-estop);
-            color: #FFF;
-            box-shadow: 0 0 18px var(--red-estop);
-        }
+        .fault-btn.active { background: #3B0711; border-color: var(--red-estop); color: #FFF; box-shadow: 0 0 18px var(--red-estop); }
 
-        .toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
+        main.cockpit-view { padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; height: 100%; }
 
-        /* Main Cockpit Body */
-        main.cockpit-view {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        /* ISA 18.2 Alarm Ribbon */
         .alarm-annunciator {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
             border-radius: 10px;
             padding: 9px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
-
-        .alarm-matrix {
-            display: flex;
-            gap: 10px;
-        }
-
+        .alarm-matrix { display: flex; gap: 10px; }
         .alarm-box {
             padding: 5px 12px;
             border-radius: 5px;
@@ -617,9 +398,7 @@
             background: rgba(11, 16, 26, 0.85);
             border: 1px solid #19253B;
             color: #475569;
-            transition: all 0.25s;
         }
-
         .alarm-box.active-critical {
             background: rgba(255, 23, 68, 0.25);
             border-color: var(--red-estop);
@@ -627,54 +406,43 @@
             box-shadow: 0 0 16px rgba(255, 23, 68, 0.6);
             animation: alarm-flash 0.8s infinite alternate;
         }
-
         .alarm-box.active-warning {
             background: rgba(255, 215, 0, 0.2);
             border-color: var(--amber-sp);
             color: var(--amber-sp);
             box-shadow: 0 0 14px var(--amber-glow);
         }
+        @keyframes alarm-flash { 0% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        @keyframes alarm-flash {
-            0% { opacity: 0.4; }
-            100% { opacity: 1; }
+        /* Industrial KPI Dashboard Ribbon */
+        .kpi-ribbon {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
+        .kpi-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .kpi-title { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.8px; }
+        .kpi-value { font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
-        .ack-btn {
-            background: rgba(19, 30, 51, 0.8);
-            border: 1px solid var(--border-active);
-            color: #FFF;
-            padding: 5px 14px;
-            border-radius: 5px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .ack-btn:hover {
-            background: var(--border-active);
-            border-color: var(--cyan-primary);
-            box-shadow: 0 0 10px var(--cyan-glow);
-        }
-
-        /* Twin & Gauges Dual Panel */
         .twin-dashboard-row {
             display: grid;
             grid-template-columns: 1.4fr 1fr;
             gap: 14px;
         }
+        @media (max-width: 1400px) { .twin-dashboard-row { grid-template-columns: 1fr; } }
 
-        @media (max-width: 1400px) {
-            .twin-dashboard-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* SVG Synoptic Twin Card */
-        .synoptic-card {
+        .synoptic-card, .gauges-card, .oscilloscope-card, .gateway-card {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-dim);
             border-radius: 10px;
             padding: 12px;
@@ -682,132 +450,24 @@
             display: flex;
             flex-direction: column;
         }
+        .synoptic-svg-wrap { width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; }
 
-        .synoptic-svg-wrap {
-            width: 100%;
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .gauges-duo { display: flex; align-items: center; justify-content: space-around; flex: 1; }
+        .gauge-module { display: flex; flex-direction: column; align-items: center; }
+        .gauge-svg { width: 180px; height: 115px; }
+        .gauge-val-display { margin-top: -24px; text-align: center; }
+        .gauge-number { font-size: 1.5rem; font-weight: 800; }
+        .gauge-sub { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 1px; }
 
-        /* Gauges Cluster Card */
-        .gauges-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-        }
+        .oscillo-canvas-wrap { position: relative; width: 100%; height: 190px; }
+        canvas#scopeCanvas { width: 100%; height: 100%; display: block; border-radius: 6px; background: #03060B; }
 
-        .gauges-duo {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            flex: 1;
-        }
+        .gateway-bottom-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; margin-bottom: 8px; }
+        @media (max-width: 1300px) { .gateway-bottom-row { grid-template-columns: 1fr; } }
 
-        .gauge-module {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-
-        .gauge-svg {
-            width: 180px;
-            height: 115px;
-        }
-
-        .gauge-val-display {
-            margin-top: -24px;
-            text-align: center;
-        }
-
-        .gauge-number {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .gauge-sub {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        /* Oscilloscope Plot Card */
-        .oscilloscope-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .oscillo-canvas-wrap {
-            position: relative;
-            width: 100%;
-            height: 190px;
-        }
-
-        canvas#scopeCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            border-radius: 6px;
-            background: #03060B;
-            border: 1px solid rgba(19, 30, 51, 0.4);
-        }
-
-        /* Bottom Gateway & Hex Matrix */
-        .gateway-bottom-row {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 14px;
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 1300px) {
-            .gateway-bottom-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .gateway-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-dim);
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        table.modbus-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.72rem;
-            text-align: left;
-        }
-
-        table.modbus-table th {
-            color: var(--text-muted);
-            font-weight: 600;
-            padding: 6px 8px;
-            border-bottom: 1px solid var(--border-dim);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        table.modbus-table td {
-            padding: 6px 8px;
-            border-bottom: 1px solid rgba(19, 30, 51, 0.4);
-            font-family: 'JetBrains Mono', monospace;
-        }
+        table.modbus-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; text-align: left; }
+        table.modbus-table th { color: var(--text-muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border-dim); font-family: 'JetBrains Mono', monospace; }
+        table.modbus-table td { padding: 6px 8px; border-bottom: 1px solid rgba(19, 30, 51, 0.4); font-family: 'JetBrains Mono', monospace; }
 
         .terminal-box {
             background: rgba(3, 5, 9, 0.85);
@@ -822,15 +482,11 @@
             flex-direction: column;
             gap: 4px;
         }
-
-        .hex-line {
-            line-height: 1.4;
-        }
         .hex-line.tx { color: var(--amber-sp); }
         .hex-line.rx { color: var(--cyan-primary); }
         .hex-line.sys { color: var(--text-muted); }
 
-        .btn-export {
+        .btn-export, .ack-btn {
             background: rgba(14, 22, 38, 0.8);
             border: 1px solid var(--border-active);
             color: #FFF;
@@ -839,15 +495,9 @@
             font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-        .btn-export:hover {
-            border-color: var(--emerald-online);
-            color: var(--emerald-online);
-            box-shadow: 0 0 10px var(--emerald-glow);
         }
     </style>
 </head>
@@ -874,7 +524,10 @@
             <div style="color: var(--text-muted);">
                 RTT: <span style="color: var(--cyan-primary);">2.4ms</span>
             </div>
-            <button class="audio-toggle-btn" id="audioToggle" title="Toggle Synthesized HMI Audio">
+            <button class="action-icon-btn" id="themeToggle" title="Switch Theme (OLED vs Slate)">
+                <i data-lucide="palette" style="width: 16px; height: 16px;"></i>
+            </button>
+            <button class="action-icon-btn" id="audioToggle" title="Toggle Synthesized HMI Audio">
                 <i data-lucide="volume-2" style="width: 16px; height: 16px;"></i>
             </button>
         </div>
@@ -972,7 +625,7 @@
                     <button class="disturb-btn mono" id="btnShockPos">+20% SHOCK</button>
                     <button class="disturb-btn mono" id="btnShockNeg">-20% DROP</button>
                 </div>
-                <div class="toggle-row mono">
+                <div class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
                     <span>SENSOR GAUSSIAN NOISE</span>
                     <input type="checkbox" id="checkNoise" style="cursor: pointer;">
                 </div>
@@ -1017,14 +670,34 @@
                 </div>
             </div>
 
+            <!-- Industrial KPI Ribbon -->
+            <div class="kpi-ribbon">
+                <div class="kpi-card">
+                    <span class="kpi-title mono">OEE EFFICIENCY</span>
+                    <span class="kpi-value" id="kpiOEE" style="color: var(--emerald-online);">99.2%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title mono">SETTLING TIME (Ts)</span>
+                    <span class="kpi-value" id="kpiTs" style="color: var(--cyan-primary);">3.2s</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title mono">PEAK OVERSHOOT (Mp)</span>
+                    <span class="kpi-value" id="kpiMp" style="color: var(--amber-sp);">1.4%</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title mono">LOOP STATUS</span>
+                    <span class="kpi-value" id="kpiStatus" style="color: var(--emerald-online);">OPTIMAL</span>
+                </div>
+            </div>
+
             <!-- Twin & Gauges Dual Panel -->
             <div class="twin-dashboard-row">
                 
                 <!-- Dynamic SVG Synoptic Twin -->
                 <div class="synoptic-card cyan-accent">
                     <div class="panel-header">
-                        <span class="panel-title mono"><i data-lucide="box" style="width: 14px; height: 14px;"></i> SYNOPTIC DIGITAL TWIN // PROCESS TANK</span>
-                        <span class="mono" style="color: var(--cyan-primary); font-size: 0.7rem;" id="twinStatusTag">60 FPS REAL-TIME</span>
+                        <span class="panel-title mono"><i data-lucide="box" style="width: 14px; height: 14px;"></i> SYNOPTIC DIGITAL TWIN // VOLUMETRIC TANK</span>
+                        <span class="mono" style="color: var(--cyan-primary); font-size: 0.7rem;" id="twinStatusTag">60 FPS DYNAMIC</span>
                     </div>
                     
                     <div class="synoptic-svg-wrap">
@@ -1054,10 +727,31 @@
                             <!-- Tank Shell -->
                             <rect x="120" y="35" width="220" height="160" rx="8" fill="url(#tankShell)" stroke="#1D2E4D" stroke-width="2"/>
                             
-                            <!-- Liquid Body with Wave Simulation -->
+                            <!-- Volumetric Gauge Ruler (Left Side) -->
+                            <g opacity="0.6">
+                                <line x1="126" y1="35" x2="136" y2="35" stroke="#00E5FF" stroke-width="1.5"/>
+                                <text x="140" y="38" fill="#64748B" font-family="JetBrains Mono" font-size="7">100%</text>
+                                
+                                <line x1="126" y1="75" x2="133" y2="75" stroke="#00E5FF" stroke-width="1"/>
+                                <text x="138" y="78" fill="#64748B" font-family="JetBrains Mono" font-size="7">75%</text>
+                                
+                                <line x1="126" y1="115" x2="136" y2="115" stroke="#00E5FF" stroke-width="1.5"/>
+                                <text x="140" y="118" fill="#64748B" font-family="JetBrains Mono" font-size="7">50%</text>
+                                
+                                <line x1="126" y1="155" x2="133" y2="155" stroke="#00E5FF" stroke-width="1"/>
+                                <text x="138" y="158" fill="#64748B" font-family="JetBrains Mono" font-size="7">25%</text>
+                                
+                                <line x1="126" y1="195" x2="136" y2="195" stroke="#00E5FF" stroke-width="1.5"/>
+                                <text x="140" y="195" fill="#64748B" font-family="JetBrains Mono" font-size="7">0%</text>
+                            </g>
+
+                            <!-- Liquid Body with Wave Simulation & Rising Bubbles -->
                             <g clip-path="url(#tankInnerClip)">
                                 <path id="fluidWavePath" fill="url(#fluidColor)" d="M 120,120 Q 175,115 230,120 T 340,120 L 340,200 L 120,200 Z"/>
                                 <line id="surfaceGlowLine" x1="120" y1="120" x2="340" y2="120" stroke="#00E5FF" stroke-width="3" filter="url(#glowCyan)" opacity="0.8"/>
+                                
+                                <!-- Dynamic Volumetric Bubbles Group -->
+                                <g id="bubblesContainer"></g>
                             </g>
 
                             <!-- Target Setpoint Laser Reference -->
@@ -1135,10 +829,10 @@
 
             </div>
 
-            <!-- Real-time 60FPS Oscilloscope -->
+            <!-- Real-time 60FPS Phosphor Oscilloscope -->
             <div class="oscilloscope-card cyan-accent">
                 <div class="panel-header">
-                    <span class="panel-title mono"><i data-lucide="activity" style="width: 14px; height: 14px;"></i> 60FPS HIGH-FREQUENCY REAL-TIME OSCILLOSCOPE</span>
+                    <span class="panel-title mono"><i data-lucide="activity" style="width: 14px; height: 14px;"></i> 60FPS PHOSPHOR RADAR OSCILLOSCOPE</span>
                     <div class="mono" style="font-size: 0.7rem; display: flex; gap: 14px;">
                         <span style="color: var(--amber-sp);">● SP TARGET</span>
                         <span style="color: var(--cyan-primary);">● PV PROCESS</span>
@@ -1226,10 +920,16 @@
     </div>
 
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
 
-        // System Audio Synthesizer (Web Audio API)
+        // Theme Toggle
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('theme-slate');
+            playIndustrialBeep(720, 'sine', 0.08);
+        });
+
+        // Web Audio Synthesizer
         let audioCtx = null;
         let audioMuted = true;
         const audioBtn = document.getElementById('audioToggle');
@@ -1257,7 +957,6 @@
             playIndustrialBeep(880, 'sine', 0.1);
         });
 
-        // Clock Update
         function updateClock() {
             const now = new Date();
             document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
@@ -1285,17 +984,30 @@
             valveJam: false,
             jammedMvVal: 0.0,
             history: [],
-            waveOffset: 0
+            waveOffset: 0,
+            radarScanX: 0,
+            lastSpChange: performance.now(),
+            peakPvSinceSpChange: 0,
+            bubbles: []
         };
 
-        // Presets Definition
+        // Initialize Volumetric Bubbles
+        const bubblesContainer = document.getElementById('bubblesContainer');
+        for (let i = 0; i < 18; i++) {
+            state.bubbles.push({
+                x: 130 + Math.random() * 190,
+                y: 50 + Math.random() * 140,
+                r: 1.5 + Math.random() * 2.5,
+                speed: 25 + Math.random() * 45
+            });
+        }
+
         const presets = {
             tank: { kp: 2.6, ki: 0.75, kd: 0.15, tau: 2.5, sp: 65.0 },
             oven: { kp: 4.5, ki: 0.25, kd: 0.85, tau: 8.0, sp: 80.0 },
             motor: { kp: 1.2, ki: 1.80, kd: 0.02, tau: 0.7, sp: 50.0 }
         };
 
-        // Input Bindings
         const spRange = document.getElementById('spRange');
         const spDisplay = document.getElementById('spDisplayValue');
         const inputKp = document.getElementById('inputKp');
@@ -1311,13 +1023,12 @@
             state.sp = val;
             spRange.value = val;
             spDisplay.textContent = val.toFixed(1) + '%';
+            state.lastSpChange = performance.now();
+            state.peakPvSinceSpChange = state.pv;
             playIndustrialBeep(520, 'sine', 0.05);
         }
 
-        spRange.addEventListener('input', (e) => {
-            setSP(parseFloat(e.target.value));
-        });
-
+        spRange.addEventListener('input', (e) => setSP(parseFloat(e.target.value)));
         inputKp.addEventListener('change', (e) => state.kp = parseFloat(e.target.value) || 0.1);
         inputKi.addEventListener('change', (e) => state.ki = parseFloat(e.target.value) || 0.0);
         inputKd.addEventListener('change', (e) => state.kd = parseFloat(e.target.value) || 0.0);
@@ -1347,7 +1058,6 @@
             playIndustrialBeep(700, 'square', 0.08);
         });
 
-        // Disturbance Handlers
         document.getElementById('btnShockPos').addEventListener('click', () => {
             state.disturbance += 25.0;
             playIndustrialBeep(320, 'sawtooth', 0.15);
@@ -1357,7 +1067,6 @@
             playIndustrialBeep(280, 'sawtooth', 0.15);
         });
 
-        // Field Fault Injection Handlers
         const btnSensorDropout = document.getElementById('btnSensorDropout');
         const btnValveJam = document.getElementById('btnValveJam');
         const btnProcessSurge = document.getElementById('btnProcessSurge');
@@ -1365,13 +1074,8 @@
 
         function updateFaultStatusLed() {
             const isAnyActive = state.sensorDropout || state.valveJam;
-            if (isAnyActive) {
-                faultStatusLed.textContent = 'FAULT ACTIVE';
-                faultStatusLed.style.color = 'var(--red-estop)';
-            } else {
-                faultStatusLed.textContent = 'SYSTEM NOMINAL';
-                faultStatusLed.style.color = 'var(--emerald-online)';
-            }
+            faultStatusLed.textContent = isAnyActive ? 'FAULT ACTIVE' : 'SYSTEM NOMINAL';
+            faultStatusLed.style.color = isAnyActive ? 'var(--red-estop)' : 'var(--emerald-online)';
         }
 
         btnSensorDropout.addEventListener('click', () => {
@@ -1379,10 +1083,10 @@
             btnSensorDropout.classList.toggle('active', state.sensorDropout);
             if (state.sensorDropout) {
                 playIndustrialBeep(260, 'sawtooth', 0.2);
-                appendHexTerminal('[FAULT INJECTED] 4-20mA Sensor Loop Open-Circuit. PV clamped to 0.');
+                appendHexTerminal('[FAULT INJECTED] 4-20mA Sensor Loop Open-Circuit.');
             } else {
                 playIndustrialBeep(600, 'sine', 0.08);
-                appendHexTerminal('[FAULT RECOVERED] 4-20mA Sensor Loop restored.');
+                appendHexTerminal('[FAULT RECOVERED] Sensor Loop normalized.');
             }
             updateFaultStatusLed();
         });
@@ -1393,7 +1097,7 @@
             if (state.valveJam) {
                 state.jammedMvVal = state.mv;
                 playIndustrialBeep(300, 'sawtooth', 0.2);
-                appendHexTerminal(`[FAULT INJECTED] Valve Mechanical Jam. MV locked at ${state.jammedMvVal.toFixed(1)}%.`);
+                appendHexTerminal(`[FAULT INJECTED] Valve Jammed at ${state.jammedMvVal.toFixed(1)}%.`);
             } else {
                 playIndustrialBeep(600, 'sine', 0.08);
                 appendHexTerminal('[FAULT RECOVERED] Valve Actuator Freed.');
@@ -1404,10 +1108,9 @@
         btnProcessSurge.addEventListener('click', () => {
             state.disturbance += 40.0;
             playIndustrialBeep(220, 'sawtooth', 0.25);
-            appendHexTerminal('[FAULT INJECTED] Major Process Surge (+40% Slug)');
+            appendHexTerminal('[FAULT INJECTED] Major Surge (+40% Slug)');
         });
 
-        // E-STOP Logic
         const btnEstop = document.getElementById('btnEstop');
         const btnResetEstop = document.getElementById('btnResetEstop');
         const estopLed = document.getElementById('estopLed');
@@ -1424,7 +1127,7 @@
             telemetryStateText.textContent = 'E-STOP LATCHED // ACTUATOR LOCKED';
             telemetryStateText.style.color = 'var(--red-estop)';
             playIndustrialBeep(180, 'sawtooth', 0.4);
-            appendHexTerminal('[CRITICAL] EMERGENCY STOP TRIGGERED. Holding register 40002 clamped to 0.');
+            appendHexTerminal('[CRITICAL] EMERGENCY STOP TRIGGERED.');
         });
 
         btnResetEstop.addEventListener('click', () => {
@@ -1437,10 +1140,9 @@
             telemetryStateText.textContent = 'TELEMETRY: ACTIVE (60 FPS)';
             telemetryStateText.style.color = 'var(--emerald-online)';
             playIndustrialBeep(600, 'sine', 0.1);
-            appendHexTerminal('[RECOVERY] Safety interlock acknowledged and reset.');
+            appendHexTerminal('[RECOVERY] Interlock acknowledged and reset.');
         });
 
-        // Canvas Setup for Oscilloscope
         const canvas = document.getElementById('scopeCanvas');
         const ctx = canvas.getContext('2d');
         function resizeCanvas() {
@@ -1450,7 +1152,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Hex Terminal Logging
         const terminal = document.getElementById('hexTerminal');
         function appendHexTerminal(msg, type = 'sys') {
             const now = new Date();
@@ -1463,7 +1164,6 @@
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        // Modbus Frame Generator
         setInterval(() => {
             if (state.isEstop) return;
             const rawPv = Math.floor((state.pv / 100) * 27648);
@@ -1472,7 +1172,6 @@
             const hexPv = rawPv.toString(16).toUpperCase().padStart(4, '0');
             const hexMv = rawMv.toString(16).toUpperCase().padStart(4, '0');
             const hexSp = rawSp.toString(16).toUpperCase().padStart(4, '0');
-
             appendHexTerminal(`TX >> [00 01 00 00 00 06 01 03 00 00 00 05]`, 'tx');
             appendHexTerminal(`RX << [00 01 00 00 00 0D 01 03 0A ${hexPv} ${hexMv} ${hexSp} 0001 0000] (2.4ms)`, 'rx');
         }, 850);
@@ -1484,10 +1183,7 @@
 
         function initHardwareWebSocket() {
             wsConnection = new WebSocket(WS_SERVER_URL);
-            wsConnection.onopen = () => {
-                isRealtimeHardwareActive = true;
-                appendHexTerminal("[GATEWAY] Connected to Python WebSocket Bridge.");
-            };
+            wsConnection.onopen = () => { isRealtimeHardwareActive = true; appendHexTerminal("[GATEWAY] Python WebSocket Bridge Connected."); };
             wsConnection.onmessage = (event) => {
                 try {
                     const telemetry = JSON.parse(event.data);
@@ -1498,14 +1194,11 @@
                 } catch (err) {}
             };
             wsConnection.onerror = () => { isRealtimeHardwareActive = false; };
-            wsConnection.onclose = () => {
-                isRealtimeHardwareActive = false;
-                setTimeout(initHardwareWebSocket, 4000);
-            };
+            wsConnection.onclose = () => { isRealtimeHardwareActive = false; setTimeout(initHardwareWebSocket, 4000); };
         }
         window.addEventListener('load', initHardwareWebSocket);
 
-        // 60FPS Physics, PID, and Visualization Engine
+        // 60FPS Physics Engine Loop
         let lastTime = performance.now();
 
         function engineLoop(currentTime) {
@@ -1520,7 +1213,6 @@
                         state.integral = Math.max(-40, Math.min(40, state.integral));
                         const derivative = (state.pv - state.lastPv) / dt;
                         state.lastPv = state.pv;
-
                         let output = (state.kp * error) + (state.ki * state.integral) - (state.kd * derivative);
                         state.mv = Math.max(0.0, Math.min(100.0, output));
                     } else {
@@ -1537,17 +1229,14 @@
             }
 
             let renderedPv = state.pv;
-            if (state.sensorDropout) {
-                renderedPv = 0.0;
-            } else if (state.noise) {
-                renderedPv += (Math.random() - 0.5) * 0.8;
-            }
+            if (state.sensorDropout) renderedPv = 0.0;
+            else if (state.noise) renderedPv += (Math.random() - 0.5) * 0.8;
             renderedPv = Math.max(0.0, Math.min(100.0, renderedPv));
 
             state.history.push({ sp: state.sp, pv: renderedPv, mv: state.mv });
             if (state.history.length > 250) state.history.shift();
 
-            // 1. Update Synoptic SVG Twin
+            // Synoptic Tank & Bubbles Simulation
             state.waveOffset += dt * 4;
             const tankH = 160;
             const liquidLevelH = (renderedPv / 100) * tankH;
@@ -1560,6 +1249,16 @@
             document.getElementById('fluidWavePath').setAttribute('d', wavePath);
             document.getElementById('surfaceGlowLine').setAttribute('y1', liquidY);
             document.getElementById('surfaceGlowLine').setAttribute('y2', liquidY);
+
+            // Volumetric Bubbles Render
+            let bubbleSvg = "";
+            const bubbleSpeedMultiplier = (state.mv / 100) * 1.5 + 0.3;
+            state.bubbles.forEach(b => {
+                b.y -= b.speed * bubbleSpeedMultiplier * dt;
+                if (b.y < liquidY) b.y = 190;
+                bubbleSvg += `<circle cx="${b.x}" cy="${b.y}" r="${b.r}" fill="rgba(255,255,255,0.3)" />`;
+            });
+            bubblesContainer.innerHTML = bubbleSvg;
 
             document.getElementById('svgSpLine').setAttribute('y1', spY);
             document.getElementById('svgSpLine').setAttribute('y2', spY);
@@ -1590,77 +1289,79 @@
                 beaconText.style.color = 'var(--emerald-online)';
             }
 
-            // 2. Update Radial Dials
+            // Radial Dials
             const arcLength = 236;
-            const pvOffset = arcLength - (renderedPv / 100) * arcLength;
-            const mvOffset = arcLength - (state.mv / 100) * arcLength;
-            document.getElementById('gaugePvArc').style.strokeDashoffset = pvOffset;
-            document.getElementById('gaugeMvArc').style.strokeDashoffset = mvOffset;
+            document.getElementById('gaugePvArc').style.strokeDashoffset = arcLength - (renderedPv / 100) * arcLength;
+            document.getElementById('gaugeMvArc').style.strokeDashoffset = arcLength - (state.mv / 100) * arcLength;
             document.getElementById('gaugePvText').textContent = renderedPv.toFixed(1) + '%';
             document.getElementById('gaugeMvText').textContent = state.mv.toFixed(1) + '%';
+            document.getElementById('gaugeSpNeedle').setAttribute('transform', `rotate(${-180 + (state.sp / 100) * 180} 100 110)`);
 
-            const spAngle = -180 + (state.sp / 100) * 180;
-            document.getElementById('gaugeSpNeedle').setAttribute('transform', `rotate(${spAngle} 100 110)`);
+            // Phosphor Radar Canvas Oscilloscope
+            renderScopeCanvas(dt);
 
-            // 3. Render Canvas
-            renderScopeCanvas();
-
-            // 4. Update Modbus Registers
-            const rawPvVal = Math.floor((renderedPv / 100) * 27648);
-            const rawMvVal = Math.floor((state.mv / 100) * 27648);
-            const rawSpVal = Math.floor((state.sp / 100) * 27648);
-            document.getElementById('mbRawPv').textContent = rawPvVal;
+            // Modbus Registers Update
+            document.getElementById('mbRawPv').textContent = Math.floor((renderedPv / 100) * 27648);
             document.getElementById('mbScaledPv').textContent = renderedPv.toFixed(2) + '%';
-            document.getElementById('mbRawMv').textContent = rawMvVal;
+            document.getElementById('mbRawMv').textContent = Math.floor((state.mv / 100) * 27648);
             document.getElementById('mbScaledMv').textContent = state.mv.toFixed(2) + '%';
-            document.getElementById('mbRawSp').textContent = rawSpVal;
+            document.getElementById('mbRawSp').textContent = Math.floor((state.sp / 100) * 27648);
             document.getElementById('mbScaledSp').textContent = state.sp.toFixed(2) + '%';
 
-            // 5. Update Alarms
+            // Alarms
             const alarmHH = document.getElementById('alarmHH');
             const alarmDEV = document.getElementById('alarmDEV');
             const alarmNORM = document.getElementById('alarmNORM');
-            const mbAlarmWord = document.getElementById('mbRawAlarm');
-            const mbAlarmScaled = document.getElementById('mbScaledAlarm');
-
             let hasAlarm = false;
-            if (renderedPv >= 90.0) {
-                alarmHH.className = 'alarm-box active-critical';
-                hasAlarm = true;
-            } else {
-                alarmHH.className = 'alarm-box';
-            }
 
-            if (Math.abs(state.sp - renderedPv) > 15.0) {
-                alarmDEV.className = 'alarm-box active-warning';
-                hasAlarm = true;
-            } else {
-                alarmDEV.className = 'alarm-box';
-            }
+            if (renderedPv >= 90.0) { alarmHH.className = 'alarm-box active-critical'; hasAlarm = true; }
+            else { alarmHH.className = 'alarm-box'; }
 
-            if (hasAlarm) {
-                alarmNORM.style.opacity = '0.3';
-                mbAlarmWord.textContent = '0x0004';
-                mbAlarmScaled.textContent = 'ALARM_ACTIVE';
-                mbAlarmScaled.style.color = 'var(--red-estop)';
-            } else {
-                alarmNORM.style.opacity = '1';
-                mbAlarmWord.textContent = '0x0000';
-                mbAlarmScaled.textContent = 'CLEAR';
-                mbAlarmScaled.style.color = 'var(--emerald-online)';
-            }
+            if (Math.abs(state.sp - renderedPv) > 15.0) { alarmDEV.className = 'alarm-box active-warning'; hasAlarm = true; }
+            else { alarmDEV.className = 'alarm-box'; }
+
+            alarmNORM.style.opacity = hasAlarm ? '0.3' : '1';
+
+            // Industrial KPIs Realtime Calculation
+            const errorAbs = Math.abs(state.sp - renderedPv);
+            const tsCalc = (state.tau * 2.8).toFixed(1);
+            document.getElementById('kpiTs').textContent = `${tsCalc}s`;
+            
+            const overshoot = Math.max(0, renderedPv - state.sp).toFixed(1);
+            document.getElementById('kpiMp').textContent = `${overshoot}%`;
+
+            const oeeScore = (100 - (errorAbs * 0.4) - (state.isEstop ? 50 : 0)).toFixed(1);
+            document.getElementById('kpiOEE').textContent = `${Math.max(50, Math.min(100, oeeScore))}%`;
+
+            const kpiStatus = document.getElementById('kpiStatus');
+            if (state.isEstop) { kpiStatus.textContent = "HALTED"; kpiStatus.style.color = "var(--red-estop)"; }
+            else if (hasAlarm) { kpiStatus.textContent = "WARNING"; kpiStatus.style.color = "var(--amber-sp)"; }
+            else { kpiStatus.textContent = "OPTIMAL"; kpiStatus.style.color = "var(--emerald-online)"; }
 
             requestAnimationFrame(engineLoop);
         }
 
-        // Canvas Rendering Logic
-        function renderScopeCanvas() {
+        // Phosphor Trail Canvas Rendering Logic
+        function renderScopeCanvas(dt) {
             const w = canvas.width;
             const h = canvas.height;
-            ctx.clearRect(0, 0, w, h);
 
+            // Phosphor Decay Effect (Soft Fade)
+            ctx.fillStyle = 'rgba(3, 6, 11, 0.22)';
+            ctx.fillRect(0, 0, w, h);
+
+            // Radar Scanline Movement
+            state.radarScanX = (state.radarScanX + dt * 140) % w;
+            ctx.beginPath();
+            ctx.moveTo(state.radarScanX, 0);
+            ctx.lineTo(state.radarScanX, h);
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Grid Lines
             ctx.lineWidth = 1;
-            ctx.strokeStyle = 'rgba(15, 24, 39, 0.8)';
+            ctx.strokeStyle = 'rgba(29, 45, 77, 0.2)';
             for (let x = 0; x < w; x += 40) {
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
@@ -1678,29 +1379,17 @@
             if (pts.length < 2) return;
             const dx = w / (pts.length - 1);
 
-            // MV Area
-            ctx.beginPath();
-            ctx.moveTo(0, h);
-            for (let i = 0; i < pts.length; i++) {
-                const y = h - (pts[i].mv / 100) * (h - 10) - 5;
-                ctx.lineTo(i * dx, y);
-            }
-            ctx.lineTo(w, h);
-            ctx.closePath();
-            ctx.fillStyle = 'rgba(255, 61, 0, 0.08)';
-            ctx.fill();
-
-            // MV Line
+            // 1. MV Waveform
             ctx.beginPath();
             for (let i = 0; i < pts.length; i++) {
                 const y = h - (pts[i].mv / 100) * (h - 10) - 5;
                 if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * dx, y);
             }
             ctx.strokeStyle = '#FF3D00';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.6;
             ctx.stroke();
 
-            // SP Line
+            // 2. SP Reference
             ctx.beginPath();
             ctx.setLineDash([5, 4]);
             for (let i = 0; i < pts.length; i++) {
@@ -1712,7 +1401,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // PV Line
+            // 3. Glowing Phosphor PV Waveform
             ctx.beginPath();
             for (let i = 0; i < pts.length; i++) {
                 const y = h - (pts[i].pv / 100) * (h - 10) - 5;
@@ -1721,7 +1410,7 @@
             ctx.strokeStyle = '#00E5FF';
             ctx.lineWidth = 2.8;
             ctx.shadowColor = '#00E5FF';
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             ctx.stroke();
             ctx.shadowBlur = 0;
         }
@@ -1742,10 +1431,9 @@
             playIndustrialBeep(750, 'triangle', 0.1);
         });
 
-        // Alarm Acknowledge
         document.getElementById('btnAck').addEventListener('click', () => {
             playIndustrialBeep(920, 'sine', 0.05);
-            appendHexTerminal('[ACK] Operator acknowledged active alarm state.');
+            appendHexTerminal('[ACK] Operator acknowledged alarms.');
         });
 
         // Start Loop
