@@ -13,6 +13,13 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden !important;
+        }
+
         :root {
             --bg-base: #030508;
             --bg-surface: #070B12;
@@ -90,13 +97,14 @@
 
         /* Tactical Sidebar Custom Scrollbar */
         aside.tactical-sidebar::-webkit-scrollbar {
-            width: 8px;
+            width: 7px !important;
+            display: block !important;
         }
         aside.tactical-sidebar::-webkit-scrollbar-track {
-            background: #070B12;
+            background: #05080E;
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb {
-            background: #1D2D4D;
+            background: #1E2D48;
             border-radius: 4px;
         }
         aside.tactical-sidebar::-webkit-scrollbar-thumb:hover {
@@ -210,11 +218,10 @@
         .workspace-grid {
             display: grid;
             grid-template-columns: 360px 1fr;
-            flex: 1;
             height: calc(100vh - 54px);
             max-height: calc(100vh - 54px);
-            min-height: 0;
             overflow: hidden;
+            position: relative;
         }
 
         @media (max-width: 1200px) {
@@ -224,19 +231,25 @@
         }
 
         /* Sidebar Control Center */
-        aside.tactical-sidebar {
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border-dim);
-            padding: 16px;
-            height: 100%;
-            max-height: 100%;
-            overflow-y: scroll !important;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-sizing: border-box;
-        }
+aside.tactical-sidebar {
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-dim);
+    padding: 16px;
+    height: 100%;
+    max-height: calc(100vh - 54px);
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    display: block !important;
+    box-sizing: border-box;
+}
+
+/* بطاقات القائمة داخل الـ sidebar نعطيها margin-bottom بدلاً من gap */
+aside.tactical-sidebar .card-panel {
+    margin-bottom: 16px;
+}
+aside.tactical-sidebar .card-panel:last-child {
+    margin-bottom: 30px;
+}
 
         .card-panel {
             background: var(--bg-card);
